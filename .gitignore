@@ -1,0 +1,13 @@
+# Ambiente e chaves (nunca versionar)
+.env
+
+# Uploads (opcional - descomente se não quiser versionar fotos)
+# /uploads/trees/*
+# /uploads/users/*
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

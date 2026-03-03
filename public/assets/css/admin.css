@@ -1,0 +1,27 @@
+/* Admin Green Air */
+.admin-body { background: #f1f5f9; }
+.admin-header { background: #0f172a; color: #fff; padding: .75rem 0; }
+.admin-header .container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .5rem; }
+.admin-logo { color: #fff; font-weight: 700; }
+.admin-header nav { display: flex; gap: 1rem; flex-wrap: wrap; }
+.admin-header nav a { color: #94a3b8; }
+.admin-header nav a:hover { color: #fff; }
+.admin-main { padding: 2rem 1rem; }
+.admin-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+.admin-stats .stat-card { background: #fff; padding: 1.25rem; border-radius: 12px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.admin-stats .stat-warning .stat-value { color: #dc2626; }
+.admin-section { background: #fff; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.admin-section h2 { margin: 0 0 1rem; font-size: 1.1rem; }
+.admin-table { width: 100%; border-collapse: collapse; }
+.admin-table th, .admin-table td { padding: .5rem .75rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+.admin-table th { background: #f8fafc; font-weight: 600; }
+.admin-table .thumb-sm { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; }
+.admin-form label { display: block; margin-bottom: 1rem; }
+.admin-form label span { display: block; margin-bottom: .25rem; font-weight: 500; }
+.admin-form input, .admin-form select, .admin-form textarea { width: 100%; max-width: 400px; padding: .5rem .75rem; border: 1px solid #e2e8f0; border-radius: 8px; }
+.admin-form-inline { margin-bottom: 1rem; }
+.form-inline { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
+.form-inline input { padding: .5rem .75rem; border: 1px solid #e2e8f0; border-radius: 8px; }
+.admin-filters { display: flex; gap: .5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+.chart-box { padding: 1rem; background: #f8fafc; border-radius: 8px; }
