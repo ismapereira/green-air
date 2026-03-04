@@ -1,4 +1,14 @@
-# Green Air — Mapeamento Colaborativo de Árvores Urbanas
+<h1 align="center"> 🌳 Green Air - Mapeamento Colaborativo de Árvores Urbanas</h1>
+
+<p align="center">
+  <img src = "https://img.shields.io/badge/License-MIT-green.svg">
+  <img src = "https://img.shields.io/badge/PHP-8.x-777BB4?logo=php&logoColor=white">
+  <img src = "https://img.shields.io/badge/MySQL-Database-4479A1?logo=mysql&logoColor=white">
+  <img src = "https://img.shields.io/badge/API-OpenWeather-orange?logo=icloud&logoColor=white">
+  <img src = "https://img.shields.io/badge/Map-Leaflet-199900?logo=leaflet&logoColor=white">
+  <img src = "https://img.shields.io/badge/Open%20Source-Yes-brightgreen?logo=opensourceinitiative">
+  <img src = "https://img.shields.io/badge/Urban%20Ecology-Tree%20Mapping-3CB371?logo=leaflet">
+</p>
 
 Aplicação web completa (PHP puro + MySQL + HTML/CSS/JS) para **mapear árvores urbanas** de forma colaborativa: cadastro com foto e GPS, mapa interativo, gamificação por pontos/níveis e painel administrativo com indicadores e gráficos.
 
