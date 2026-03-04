@@ -80,6 +80,13 @@ class AuthController extends Controller
             $this->redirect('/registro');
             return;
         }
+        
+        if (!isset($_POST['terms'])) {
+            $_SESSION['register_error'] = 'Você precisa aceitar os Termos de Uso para se cadastrar.';
+            $_SESSION['register_old'] = $_POST;
+            $this->redirect('/registro');
+            return;
+        }
         if (strlen($password) < 6) {
             $_SESSION['register_error'] = 'Senha deve ter no mínimo 6 caracteres.';
             $_SESSION['register_old'] = $_POST;
