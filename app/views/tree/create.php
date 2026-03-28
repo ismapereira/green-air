@@ -1,5 +1,5 @@
 <?php
-$pageTitle = 'Cadastrar árvore';
+$pageTitle = 'Cadastrar Árvore';
 $user = $user ?? [];
 $species = $species ?? [];
 $statuses = $statuses ?? [];
@@ -7,60 +7,80 @@ $error = $error ?? null;
 $old = $old ?? [];
 require ROOT_PATH . '/app/views/layout/header.php';
 ?>
-<div class="container form-page">
-    <h1>Cadastrar árvore</h1>
+<div class="container py-4" style="max-width:600px">
+    <h4 class="fw-bold mb-1"><i class="bi bi-tree text-success me-2"></i>Cadastrar Árvore</h4>
+    <p class="text-muted small mb-3">Ative a localização para captura automática do GPS.</p>
+
     <?php if ($error): ?>
-        <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
+        <div class="alert alert-danger py-2 small"><i class="bi bi-exclamation-circle me-2"></i><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
-    <p class="hint">Ative a localização no navegador para capturar latitude/longitude automaticamente.</p>
-    <form method="post" action="<?= BASE_URL ?>cadastrar-arvore" class="tree-form" enctype="multipart/form-data" id="tree-form">
+
+    <form method="post" action="<?= BASE_URL ?>cadastrar-arvore" enctype="multipart/form-data" id="tree-form">
+        <input type="hidden" name="_csrf" value="<?= $csrfToken ?>">
         <input type="hidden" name="latitude" id="input-latitude">
         <input type="hidden" name="longitude" id="input-longitude">
-        <label>
-            <span>Foto da árvore *</span>
-            <input type="file" name="photo" accept="image/jpeg,image/png,image/webp" required>
-        </label>
-        <label>
-            <span>Espécie *</span>
-            <select name="species_id" required>
-                <option value="">Selecione</option>
-                <?php foreach ($species as $s): ?>
-                    <option value="<?= (int)$s['id'] ?>" <?= (($old['species_id'] ?? '') == $s['id']) ? 'selected' : '' ?>><?= htmlspecialchars($s['name']) ?></option>
-                <?php endforeach; ?>
-            </select>
-        </label>
-        <label>
-            <span>Status de preservação *</span>
-            <select name="status_id" required>
-                <option value="">Selecione</option>
-                <?php foreach ($statuses as $st): ?>
-                    <option value="<?= (int)$st['id'] ?>" <?= (($old['status_id'] ?? '') == $st['id']) ? 'selected' : '' ?>><?= htmlspecialchars($st['name']) ?></option>
-                <?php endforeach; ?>
-            </select>
-        </label>
-        <label>
-            <span>Tamanho aproximado</span>
-            <select name="size">
-                <option value="">Selecione</option>
-                <option value="Pequeno" <?= ($old['size'] ?? '') === 'Pequeno' ? 'selected' : '' ?>>Pequeno</option>
-                <option value="Médio" <?= ($old['size'] ?? '') === 'Médio' ? 'selected' : '' ?>>Médio</option>
-                <option value="Grande" <?= ($old['size'] ?? '') === 'Grande' ? 'selected' : '' ?>>Grande</option>
-            </select>
-        </label>
-        <label>
-            <span>Idade aproximada (anos)</span>
-            <input type="number" name="age_approx" min="0" value="<?= htmlspecialchars($old['age_approx'] ?? '') ?>">
-        </label>
-        <label>
-            <span>Endereço aproximado</span>
-            <input type="text" name="address" id="input-address" placeholder="Será preenchido pelo GPS se possível" value="<?= htmlspecialchars($old['address'] ?? '') ?>">
-        </label>
-        <label>
-            <span>Observações</span>
-            <textarea name="observations" rows="3"><?= htmlspecialchars($old['observations'] ?? '') ?></textarea>
-        </label>
-        <p id="geo-status" class="geo-status">Obtendo localização...</p>
-        <button type="submit" class="btn btn-primary" id="submit-tree">Cadastrar árvore</button>
+
+        <!-- Photo Upload -->
+        <div class="mb-3">
+            <label class="form-label fw-bold">Foto da árvore *</label>
+            <div class="photo-upload-area">
+                <div class="upload-placeholder">
+                    <i class="bi bi-camera text-muted" style="font-size:2rem"></i>
+                    <p class="text-muted small mb-0 mt-1">Toque para tirar foto ou selecionar</p>
+                </div>
+                <input type="file" name="photo" accept="image/jpeg,image/png,image/webp" required>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-6">
+                <label class="form-label fw-bold">Espécie *</label>
+                <select name="species_id" class="form-select" required>
+                    <option value="">Selecione</option>
+                    <?php foreach ($species as $s): ?>
+                        <option value="<?= (int)$s['id'] ?>" <?= (($old['species_id'] ?? '') == $s['id']) ? 'selected' : '' ?>><?= htmlspecialchars($s['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-6">
+                <label class="form-label fw-bold">Status *</label>
+                <select name="status_id" class="form-select" required>
+                    <option value="">Selecione</option>
+                    <?php foreach ($statuses as $st): ?>
+                        <option value="<?= (int)$st['id'] ?>" <?= (($old['status_id'] ?? '') == $st['id']) ? 'selected' : '' ?>><?= htmlspecialchars($st['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-6">
+                <label class="form-label">Tamanho</label>
+                <select name="size" class="form-select">
+                    <option value="">-</option>
+                    <option value="Pequeno" <?= ($old['size'] ?? '') === 'Pequeno' ? 'selected' : '' ?>>Pequeno</option>
+                    <option value="Médio" <?= ($old['size'] ?? '') === 'Médio' ? 'selected' : '' ?>>Médio</option>
+                    <option value="Grande" <?= ($old['size'] ?? '') === 'Grande' ? 'selected' : '' ?>>Grande</option>
+                </select>
+            </div>
+            <div class="col-6">
+                <label class="form-label">Idade (anos)</label>
+                <input type="number" name="age_approx" class="form-control" min="0" value="<?= htmlspecialchars($old['age_approx'] ?? '') ?>">
+            </div>
+            <div class="col-12">
+                <label class="form-label">Endereço</label>
+                <input type="text" name="address" id="input-address" class="form-control" placeholder="Preenchido pelo GPS" value="<?= htmlspecialchars($old['address'] ?? '') ?>">
+            </div>
+            <div class="col-12">
+                <label class="form-label">Observações</label>
+                <textarea name="observations" class="form-control" rows="2" placeholder="Ex: próximo ao ponto de ônibus..."><?= htmlspecialchars($old['observations'] ?? '') ?></textarea>
+            </div>
+        </div>
+
+        <div id="geo-status" class="mt-3 text-center">
+            <small class="text-muted"><i class="bi bi-geo-alt me-1"></i>Obtendo localização...</small>
+        </div>
+
+        <button type="submit" class="btn btn-success w-100 mt-3 py-2 fw-bold" id="submit-tree">
+            <i class="bi bi-tree me-2"></i>Cadastrar Árvore
+        </button>
     </form>
 </div>
 <?php

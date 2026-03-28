@@ -41,6 +41,7 @@ class AdminTreeController extends Controller
 
     public function update(string $id): void
     {
+        $this->validateCsrf();
         $this->requireAdmin();
         $id = (int)$id;
         $treeModel = new Tree();
@@ -60,8 +61,11 @@ class AdminTreeController extends Controller
             'observations' => trim(filter_var($_POST['observations'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS)) ?: null
         ];
         if (!empty($_FILES['photo']['tmp_name'])) {
-            $photo = $this->handleUpload();
-            if ($photo) $data['photo'] = $photo;
+            $photo = UploadHelper::handleImage('photo', UPLOAD_TREES, 'tree');
+            if ($photo) {
+                UploadHelper::deleteOld($tree['photo'], UPLOAD_TREES);
+                $data['photo'] = $photo;
+            }
         }
         $treeModel->update($id, $data);
         $_SESSION['admin_success'] = 'Árvore atualizada.';
@@ -70,21 +74,16 @@ class AdminTreeController extends Controller
 
     public function delete(string $id): void
     {
+        $this->validateCsrf();
         $this->requireAdmin();
         $id = (int)$id;
         $treeModel = new Tree();
+        $tree = $treeModel->findById($id);
+        if ($tree) {
+            UploadHelper::deleteOld($tree['photo'] ?? null, UPLOAD_TREES);
+        }
         $treeModel->delete($id);
         $_SESSION['admin_success'] = 'Árvore removida.';
         $this->redirect('/admin/arvores');
-    }
-
-    private function handleUpload(): ?string
-    {
-        if (empty($_FILES['photo']['tmp_name']) || $_FILES['photo']['error'] !== UPLOAD_ERR_OK) return null;
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        if (!in_array($finfo->file($_FILES['photo']['tmp_name']), ALLOWED_IMAGE_TYPES) || $_FILES['photo']['size'] > MAX_FILE_SIZE) return null;
-        if (!is_dir(UPLOAD_TREES)) mkdir(UPLOAD_TREES, 0755, true);
-        $name = 'tree_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . (pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION) ?: 'jpg');
-        return move_uploaded_file($_FILES['photo']['tmp_name'], UPLOAD_TREES . '/' . $name) ? $name : null;
     }
 }

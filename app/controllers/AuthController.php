@@ -3,11 +3,13 @@ class AuthController extends Controller
 {
     private User $userModel;
     private PasswordReset $resetModel;
+    private LoginAttempt $attemptModel;
 
     public function __construct()
     {
         $this->userModel = new User();
         $this->resetModel = new PasswordReset();
+        $this->attemptModel = new LoginAttempt();
     }
 
     public function loginForm(): void
@@ -22,21 +24,35 @@ class AuthController extends Controller
 
     public function login(): void
     {
+        $this->validateCsrf();
         $email = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
         $password = $_POST['password'] ?? '';
+        $ip = $this->clientIp();
+
         if (!$email || !$password) {
             $_SESSION['login_error'] = 'Preencha e-mail e senha.';
             $this->redirect('/login');
             return;
         }
+
+        // Rate limiting
+        if ($this->attemptModel->isBlocked($email, $ip, LOGIN_MAX_ATTEMPTS, LOGIN_LOCKOUT_MINUTES)) {
+            $_SESSION['login_error'] = 'Muitas tentativas. Tente novamente em ' . LOGIN_LOCKOUT_MINUTES . ' minutos.';
+            $this->redirect('/login');
+            return;
+        }
+
         $user = $this->userModel->findByEmail($email);
         if (!$user || !password_verify($password, $user['password'])) {
+            $this->attemptModel->record($email, $ip);
             $_SESSION['login_error'] = 'E-mail ou senha incorretos.';
             $this->redirect('/login');
             return;
         }
-        session_name(SESSION_NAME);
-        session_start();
+
+        // Login bem-sucedido - limpar tentativas
+        $this->attemptModel->clearForEmail($email);
+        session_regenerate_id(true);
         unset($user['password']);
         $_SESSION['user'] = $user;
         $this->redirect('/painel');
@@ -44,8 +60,7 @@ class AuthController extends Controller
 
     public function logout(): void
     {
-        session_name(SESSION_NAME);
-        session_start();
+        // Aceita tanto GET quanto POST para compatibilidade, mas POST é preferido
         $_SESSION = [];
         if (ini_get('session.use_cookies')) {
             $p = session_get_cookie_params();
@@ -70,17 +85,18 @@ class AuthController extends Controller
 
     public function register(): void
     {
+        $this->validateCsrf();
         $name = trim(filter_var($_POST['name'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS));
         $email = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
         $password = $_POST['password'] ?? '';
         $confirm = $_POST['password_confirm'] ?? '';
+
         if (!$name || !$email || !$password) {
             $_SESSION['register_error'] = 'Preencha todos os campos.';
             $_SESSION['register_old'] = $_POST;
             $this->redirect('/registro');
             return;
         }
-        
         if (!isset($_POST['terms'])) {
             $_SESSION['register_error'] = 'Você precisa aceitar os Termos de Uso para se cadastrar.';
             $_SESSION['register_old'] = $_POST;
@@ -105,13 +121,19 @@ class AuthController extends Controller
             $this->redirect('/registro');
             return;
         }
-        $photo = $this->handleUserPhotoUpload();
-        $this->userModel->create([
+
+        $photo = UploadHelper::handleImage('photo', UPLOAD_USERS, 'user');
+        $userId = $this->userModel->create([
             'name' => $name,
             'email' => $email,
             'password' => password_hash($password, PASSWORD_DEFAULT),
             'photo' => $photo
         ]);
+
+        // Notificação de boas-vindas
+        $notif = new Notification();
+        $notif->create($userId, 'welcome', 'Bem-vindo ao Green Air! 🌳', 'Comece cadastrando sua primeira árvore e ganhe pontos.', '/cadastrar-arvore');
+
         $_SESSION['register_success'] = true;
         $this->redirect('/login');
     }
@@ -124,6 +146,7 @@ class AuthController extends Controller
 
     public function forgot(): void
     {
+        $this->validateCsrf();
         $email = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
         if (!$email) {
             $_SESSION['forgot_message'] = ['type' => 'error', 'text' => 'Informe o e-mail.'];
@@ -161,6 +184,7 @@ class AuthController extends Controller
 
     public function resetPassword(): void
     {
+        $this->validateCsrf();
         $token = $_POST['token'] ?? '';
         $password = $_POST['password'] ?? '';
         $confirm = $_POST['password_confirm'] ?? '';
@@ -177,29 +201,7 @@ class AuthController extends Controller
         }
         $this->userModel->updatePasswordByEmail($row['email'], password_hash($password, PASSWORD_DEFAULT));
         $this->resetModel->deleteByToken($token);
-        $_SESSION['login_error'] = null;
-        $_SESSION['forgot_message'] = ['type' => 'success', 'text' => 'Senha alterada. Faça login.'];
+        $_SESSION['forgot_message'] = ['type' => 'success', 'text' => 'Senha alterada com sucesso. Faça login.'];
         $this->redirect('/login');
-    }
-
-    private function handleUserPhotoUpload(): ?string
-    {
-        if (empty($_FILES['photo']['tmp_name']) || $_FILES['photo']['error'] !== UPLOAD_ERR_OK) {
-            return null;
-        }
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        $mime = $finfo->file($_FILES['photo']['tmp_name']);
-        if (!in_array($mime, ALLOWED_IMAGE_TYPES) || $_FILES['photo']['size'] > MAX_FILE_SIZE) {
-            return null;
-        }
-        if (!is_dir(UPLOAD_USERS)) {
-            mkdir(UPLOAD_USERS, 0755, true);
-        }
-        $ext = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION) ?: 'jpg';
-        $name = 'user_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
-        if (move_uploaded_file($_FILES['photo']['tmp_name'], UPLOAD_USERS . '/' . $name)) {
-            return $name;
-        }
-        return null;
     }
 }

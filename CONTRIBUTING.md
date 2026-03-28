@@ -2,7 +2,7 @@
 
 Obrigado por considerar contribuir com o **Green Air**.
 
-Este repositório usa **PHP puro (MVC simples)**, MySQL, HTML/CSS/JS e prioriza código legível, seguro e fácil de manter.
+Este repositório usa **PHP puro (MVC)**, MySQL, **Bootstrap 5**, HTML/CSS/JS e prioriza código legível, seguro e fácil de manter.
 
 ## Como começar
 
@@ -30,9 +30,11 @@ Inclua o máximo de contexto possível:
 ### Checklist
 
 - O PR tem um objetivo claro e escopo enxuto
-- Código segue o padrão existente (MVC simples, sem frameworks)
+- Código segue o padrão existente (MVC simples, sem frameworks backend)
 - Entradas do usuário continuam **validadas** e usando **PDO + prepared statements**
-- Upload de imagens continua respeitando `MAX_FILE_SIZE` e `ALLOWED_IMAGE_TYPES`
+- Upload de imagens usa o `UploadHelper` centralizado
+- **CSRF token** incluído em todos os formulários POST (`<input type="hidden" name="_csrf">`)
+- Ações destrutivas (excluir, atualizar) usam POST com CSRF
 - Atualizou a documentação em `docs/` quando necessário
 
 ### Fluxo sugerido
@@ -51,20 +53,25 @@ Inclua o máximo de contexto possível:
 
 ### PHP
 
-- Prefira **clareza** a “mágica”
+- Prefira **clareza** a "mágica"
 - Evite duplicação (DRY), mas sem abstrações desnecessárias
 - Use `filter_var(...)`, `trim()` e validações explícitas em inputs
 - Evite concatenar parâmetros em SQL; use **placeholders**
+- Sempre chame `$this->validateCsrf()` no início de ações POST
+- Use `UploadHelper` para qualquer upload de imagem
 
 ### JavaScript
 
-- ES6+ sem dependências extras
+- ES6+ sem dependências extras (frameworks via CDN)
 - Evite variáveis globais (use IIFE como o projeto já faz)
+- Para dados dinâmicos no DOM, use `textContent` em vez de `innerHTML` (prevenção XSS)
 
 ### CSS
 
-- Mantenha consistência visual com `public/assets/css/style.css` e `admin.css`
-- Prefira classes reutilizáveis e layout responsivo
+- Mantenha consistência com o design system em `public/assets/css/style.css`
+- Use as variáveis CSS definidas em `:root` (ex.: `var(--ga-primary)`)
+- Prefira classes reutilizáveis do Bootstrap 5 + classes customizadas do projeto
+- Teste em mobile primeiro (mobile-first)
 
 ## Segurança
 
@@ -76,4 +83,3 @@ Se você encontrar uma vulnerabilidade:
 ## Licença
 
 Ao contribuir, você concorda que seu código será distribuído sob os termos da licença do projeto (ver `LICENSE`).
-

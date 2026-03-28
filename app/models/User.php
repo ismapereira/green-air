@@ -3,24 +3,31 @@ class User extends Model
 {
     public function findByEmail(string $email): ?array
     {
-        return $this->fetchOne('SELECT u.*, ul.name as level_name FROM users u 
-            JOIN user_levels ul ON u.level_id = ul.id WHERE u.email = ?', [$email]);
+        return $this->fetchOne(
+            'SELECT u.*, ul.name as level_name FROM users u
+             JOIN user_levels ul ON u.level_id = ul.id WHERE u.email = ?',
+            [$email]
+        );
     }
 
     public function findById(int $id): ?array
     {
-        return $this->fetchOne('SELECT u.*, ul.name as level_name FROM users u 
-            JOIN user_levels ul ON u.level_id = ul.id WHERE u.id = ?', [$id]);
+        return $this->fetchOne(
+            'SELECT u.*, ul.name as level_name FROM users u
+             JOIN user_levels ul ON u.level_id = ul.id WHERE u.id = ?',
+            [$id]
+        );
     }
 
     public function create(array $data): int
     {
-        $sql = 'INSERT INTO users (name, email, password, photo, level_id, points) VALUES (?, ?, ?, ?, ?, ?)';
+        $sql = 'INSERT INTO users (name, email, password, photo, role, level_id, points) VALUES (?, ?, ?, ?, ?, ?, ?)';
         $this->execute($sql, [
             $data['name'],
             $data['email'],
             $data['password'],
             $data['photo'] ?? null,
+            $data['role'] ?? 'user',
             $data['level_id'] ?? 1,
             $data['points'] ?? 0
         ]);
@@ -31,7 +38,7 @@ class User extends Model
     {
         $fields = [];
         $params = [];
-        foreach (['name', 'email', 'photo', 'level_id', 'points'] as $f) {
+        foreach (['name', 'email', 'photo', 'role', 'level_id', 'points'] as $f) {
             if (array_key_exists($f, $data)) {
                 $fields[] = "$f = ?";
                 $params[] = $data[$f];
@@ -56,7 +63,7 @@ class User extends Model
     {
         $allowed = ['name', 'email', 'created_at', 'points'];
         if (!in_array($order, $allowed)) $order = 'name';
-        return $this->fetchAll("SELECT u.*, ul.name as level_name FROM users u 
+        return $this->fetchAll("SELECT u.*, ul.name as level_name FROM users u
             JOIN user_levels ul ON u.level_id = ul.id ORDER BY u.$order ASC");
     }
 
@@ -83,7 +90,7 @@ class User extends Model
 
     public function topContributors(int $limit = 10): array
     {
-        return $this->fetchAll('SELECT u.*, ul.name as level_name FROM users u 
+        return $this->fetchAll('SELECT u.*, ul.name as level_name FROM users u
             JOIN user_levels ul ON u.level_id = ul.id ORDER BY u.points DESC LIMIT ?', [$limit]);
     }
 
@@ -91,5 +98,62 @@ class User extends Model
     {
         $r = $this->fetchOne('SELECT COUNT(*) as c FROM users');
         return (int)($r['c'] ?? 0);
+    }
+
+    public function weeklyRanking(int $limit = 10): array
+    {
+        return $this->fetchAll(
+            'SELECT u.id, u.name, u.photo, u.level_id, ul.name as level_name, SUM(c.points_awarded) as total
+             FROM contributions_log c
+             JOIN users u ON c.user_id = u.id
+             JOIN user_levels ul ON u.level_id = ul.id
+             WHERE c.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+             GROUP BY u.id ORDER BY total DESC LIMIT ?',
+            [$limit]
+        );
+    }
+
+    public function monthlyRanking(int $limit = 10): array
+    {
+        return $this->fetchAll(
+            'SELECT u.id, u.name, u.photo, u.level_id, ul.name as level_name, SUM(c.points_awarded) as total
+             FROM contributions_log c
+             JOIN users u ON c.user_id = u.id
+             JOIN user_levels ul ON u.level_id = ul.id
+             WHERE c.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+             GROUP BY u.id ORDER BY total DESC LIMIT ?',
+            [$limit]
+        );
+    }
+
+    /**
+     * Retorna informações de progresso para o próximo nível.
+     */
+    public function levelProgress(array $user): array
+    {
+        $levels = $this->fetchAll('SELECT * FROM user_levels ORDER BY min_points ASC');
+        $current = null;
+        $next = null;
+        foreach ($levels as $i => $lv) {
+            if ((int)$lv['id'] === (int)$user['level_id']) {
+                $current = $lv;
+                $next = $levels[$i + 1] ?? null;
+                break;
+            }
+        }
+        $points = (int)($user['points'] ?? 0);
+        $currentMin = (int)($current['min_points'] ?? 0);
+        $nextMin = $next ? (int)$next['min_points'] : null;
+        $progress = 100;
+        if ($next) {
+            $range = $nextMin - $currentMin;
+            $progress = $range > 0 ? min(100, round(($points - $currentMin) / $range * 100)) : 100;
+        }
+        return [
+            'current' => $current,
+            'next' => $next,
+            'progress' => $progress,
+            'points_to_next' => $next ? max(0, $nextMin - $points) : 0
+        ];
     }
 }

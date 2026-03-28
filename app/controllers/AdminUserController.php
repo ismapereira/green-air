@@ -11,21 +11,23 @@ class AdminUserController extends Controller
     public function create(): void
     {
         $user = $this->requireAdmin();
-        $levelModel = new \stdClass();
         $db = Database::getConnection();
-        $stmt = $db->query('SELECT * FROM user_levels ORDER BY min_points');
-        $levels = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $levels = $db->query('SELECT * FROM user_levels ORDER BY min_points')->fetchAll(PDO::FETCH_ASSOC);
         $this->view('admin.users.form', ['user' => $user, 'levels' => $levels, 'edit' => null]);
     }
 
     public function store(): void
     {
+        $this->validateCsrf();
         $this->requireAdmin();
         $userModel = new User();
+
         $name = trim(filter_var($_POST['name'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS));
         $email = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
         $password = $_POST['password'] ?? '';
         $levelId = (int)($_POST['level_id'] ?? 1);
+        $role = in_array($_POST['role'] ?? '', ['user', 'moderator', 'admin']) ? $_POST['role'] : 'user';
+
         if (!$name || !$email) {
             $_SESSION['admin_error'] = 'Nome e e-mail são obrigatórios.';
             $this->redirect('/admin/usuarios/novo');
@@ -37,10 +39,12 @@ class AdminUserController extends Controller
             return;
         }
         if (strlen($password) < 6) $password = bin2hex(random_bytes(4));
+
         $userModel->create([
             'name' => $name,
             'email' => $email,
             'password' => password_hash($password, PASSWORD_DEFAULT),
+            'role' => $role,
             'level_id' => $levelId
         ]);
         $_SESSION['admin_success'] = 'Usuário criado.';
@@ -63,6 +67,7 @@ class AdminUserController extends Controller
 
     public function update(string $id): void
     {
+        $this->validateCsrf();
         $this->requireAdmin();
         $id = (int)$id;
         $userModel = new User();
@@ -71,16 +76,20 @@ class AdminUserController extends Controller
             $this->redirect('/admin/usuarios');
             return;
         }
+
         $name = trim(filter_var($_POST['name'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS));
         $email = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
         $levelId = (int)($_POST['level_id'] ?? 1);
         $points = (int)($_POST['points'] ?? $edit['points']);
+        $role = in_array($_POST['role'] ?? '', ['user', 'moderator', 'admin']) ? $_POST['role'] : $edit['role'];
+
         if (!$name || !$email) {
             $_SESSION['admin_error'] = 'Nome e e-mail são obrigatórios.';
             $this->redirect('/admin/usuarios/editar/' . $id);
             return;
         }
-        $data = ['name' => $name, 'email' => $email, 'level_id' => $levelId, 'points' => $points];
+
+        $data = ['name' => $name, 'email' => $email, 'role' => $role, 'level_id' => $levelId, 'points' => $points];
         if (!empty($_POST['password'])) $data['password'] = $_POST['password'];
         $userModel->update($id, $data);
         $_SESSION['admin_success'] = 'Usuário atualizado.';
@@ -89,17 +98,19 @@ class AdminUserController extends Controller
 
     public function delete(string $id): void
     {
+        $this->validateCsrf();
         $this->requireAdmin();
         $id = (int)$id;
         $userModel = new User();
         $edit = $userModel->findById($id);
-        if (!$edit) {
+        if (!$edit || $id === 1) {
             $this->redirect('/admin/usuarios');
             return;
         }
         $db = Database::getConnection();
         $db->prepare('UPDATE trees SET user_id = 1 WHERE user_id = ?')->execute([$id]);
         $db->prepare('DELETE FROM contributions_log WHERE user_id = ?')->execute([$id]);
+        $db->prepare('DELETE FROM notifications WHERE user_id = ?')->execute([$id]);
         $db->prepare('DELETE FROM users WHERE id = ?')->execute([$id]);
         $_SESSION['admin_success'] = 'Usuário removido.';
         $this->redirect('/admin/usuarios');

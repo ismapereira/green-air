@@ -1,11 +1,21 @@
 <?php
 /**
- * Controller base - helpers de view e redirect
+ * Controller base - Green Air v2.0
+ * CSRF, autenticação, helpers de view/redirect/json
  */
 class Controller
 {
     protected function view(string $view, array $data = []): void
     {
+        // Sempre disponibilizar CSRF token e notificações não lidas para views
+        $data['csrfToken'] = $this->csrfToken();
+        $user = $this->auth();
+        if ($user) {
+            $notifModel = new Notification();
+            $data['unreadNotifications'] = $notifModel->unreadCount($user['id']);
+        } else {
+            $data['unreadNotifications'] = 0;
+        }
         extract($data);
         $viewPath = ROOT_PATH . '/app/views/' . str_replace('.', '/', $view) . '.php';
         if (!file_exists($viewPath)) {
@@ -30,12 +40,10 @@ class Controller
         exit;
     }
 
+    // ---- Autenticação ----
+
     protected function auth(): ?array
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_name(SESSION_NAME);
-            session_start();
-        }
         return $_SESSION['user'] ?? null;
     }
 
@@ -51,9 +59,36 @@ class Controller
     protected function requireAdmin(): array
     {
         $user = $this->requireAuth();
-        if ((int)($user['level_id'] ?? 0) !== LEVEL_OURO) {
+        if (($user['role'] ?? '') !== 'admin') {
             $this->redirect('/painel');
         }
         return $user;
+    }
+
+    // ---- CSRF ----
+
+    protected function csrfToken(): string
+    {
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+        return $_SESSION['csrf_token'];
+    }
+
+    protected function validateCsrf(): void
+    {
+        $token = $_POST['_csrf'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+        if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
+            http_response_code(403);
+            echo 'Token CSRF inválido. Recarregue a página e tente novamente.';
+            exit;
+        }
+    }
+
+    // ---- Helpers ----
+
+    protected function clientIp(): string
+    {
+        return $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
     }
 }

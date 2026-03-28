@@ -16,6 +16,21 @@ class TreeController extends Controller
         $this->logModel = new ContributionLog();
     }
 
+    public function show(string $id): void
+    {
+        $id = (int)$id;
+        $tree = $this->treeModel->findById($id);
+        if (!$tree) {
+            http_response_code(404);
+            require ROOT_PATH . '/app/views/errors/404.php';
+            exit;
+        }
+        $this->view('tree.show', [
+            'tree' => $tree,
+            'currentUser' => $this->auth()
+        ]);
+    }
+
     public function myTrees(): void
     {
         $user = $this->requireAuth();
@@ -39,15 +54,18 @@ class TreeController extends Controller
 
     public function store(): void
     {
+        $this->validateCsrf();
         $user = $this->requireAuth();
         $lat = isset($_POST['latitude']) ? (float)$_POST['latitude'] : null;
         $lng = isset($_POST['longitude']) ? (float)$_POST['longitude'] : null;
-        if ($lat === null || $lng === null) {
+
+        if ($lat === null || $lng === null || ($lat == 0 && $lng == 0)) {
             $_SESSION['tree_error'] = 'Ative a localização no navegador e tente novamente.';
             $_SESSION['tree_old'] = $_POST;
             $this->redirect('/cadastrar-arvore');
             return;
         }
+
         $speciesId = (int)($_POST['species_id'] ?? 0);
         $statusId = (int)($_POST['status_id'] ?? 0);
         if (!$speciesId || !$statusId) {
@@ -56,17 +74,20 @@ class TreeController extends Controller
             $this->redirect('/cadastrar-arvore');
             return;
         }
-        $photo = $this->handleTreePhotoUpload();
+
+        $photo = UploadHelper::handleImage('photo', UPLOAD_TREES, 'tree');
         if (!$photo) {
             $_SESSION['tree_error'] = 'Envie uma foto da árvore (JPEG, PNG ou WebP, até 5MB).';
             $_SESSION['tree_old'] = $_POST;
             $this->redirect('/cadastrar-arvore');
             return;
         }
+
         $address = trim(filter_var($_POST['address'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS)) ?: null;
         $size = in_array($_POST['size'] ?? '', ['Pequeno', 'Médio', 'Grande']) ? $_POST['size'] : null;
         $age = !empty($_POST['age_approx']) ? (int)$_POST['age_approx'] : null;
         $observations = trim(filter_var($_POST['observations'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS)) ?: null;
+
         $id = $this->treeModel->create([
             'user_id' => $user['id'],
             'species_id' => $speciesId,
@@ -79,9 +100,16 @@ class TreeController extends Controller
             'observations' => $observations,
             'photo' => $photo
         ]);
+
         $this->userModel->addPoints($user['id'], POINTS_NEW_TREE);
         $this->logModel->log($user['id'], $id, ContributionLog::ACTION_ADD_TREE, POINTS_NEW_TREE);
-        $_SESSION['success'] = 'Árvore cadastrada com sucesso! +' . POINTS_NEW_TREE . ' pontos.';
+
+        // Atualizar sessão com dados frescos
+        $freshUser = $this->userModel->findById($user['id']);
+        unset($freshUser['password']);
+        $_SESSION['user'] = $freshUser;
+
+        $_SESSION['success'] = 'Árvore cadastrada com sucesso! +' . POINTS_NEW_TREE . ' pontos 🌳';
         $this->redirect('/minhas-arvores');
     }
 
@@ -94,7 +122,7 @@ class TreeController extends Controller
             $this->redirect('/minhas-arvores');
             return;
         }
-        $canEdit = ($tree['user_id'] == $user['id']) || ((int)$user['level_id'] === LEVEL_OURO);
+        $canEdit = ($tree['user_id'] == $user['id']) || (($user['role'] ?? '') === 'admin');
         if (!$canEdit) {
             $this->redirect('/minhas-arvores');
             return;
@@ -113,6 +141,7 @@ class TreeController extends Controller
 
     public function update(string $id): void
     {
+        $this->validateCsrf();
         $user = $this->requireAuth();
         $id = (int)$id;
         $tree = $this->treeModel->findById($id);
@@ -120,11 +149,12 @@ class TreeController extends Controller
             $this->redirect('/minhas-arvores');
             return;
         }
-        $canEdit = ($tree['user_id'] == $user['id']) || ((int)$user['level_id'] === LEVEL_OURO);
+        $canEdit = ($tree['user_id'] == $user['id']) || (($user['role'] ?? '') === 'admin');
         if (!$canEdit) {
             $this->redirect('/minhas-arvores');
             return;
         }
+
         $data = [
             'species_id' => (int)($_POST['species_id'] ?? 0),
             'status_id' => (int)($_POST['status_id'] ?? 0),
@@ -135,20 +165,48 @@ class TreeController extends Controller
             'age_approx' => !empty($_POST['age_approx']) ? (int)$_POST['age_approx'] : null,
             'observations' => trim(filter_var($_POST['observations'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS)) ?: null
         ];
+
         if (!empty($_FILES['photo']['tmp_name'])) {
-            $photo = $this->handleTreePhotoUpload();
-            if ($photo) $data['photo'] = $photo;
+            $photo = UploadHelper::handleImage('photo', UPLOAD_TREES, 'tree');
+            if ($photo) {
+                UploadHelper::deleteOld($tree['photo'], UPLOAD_TREES);
+                $data['photo'] = $photo;
+            }
         }
+
         $this->treeModel->update($id, $data);
-        if ((int)$user['level_id'] === LEVEL_OURO) {
+        if (($user['role'] ?? '') === 'admin') {
             $this->logModel->log($user['id'], $id, ContributionLog::ACTION_EDIT_TREE, 0);
         }
-        $_SESSION['success'] = 'Árvore atualizada.';
+        $_SESSION['success'] = 'Árvore atualizada com sucesso.';
+        $this->redirect('/minhas-arvores');
+    }
+
+    public function delete(string $id): void
+    {
+        $this->validateCsrf();
+        $user = $this->requireAuth();
+        $id = (int)$id;
+        $tree = $this->treeModel->findById($id);
+        if (!$tree) {
+            $this->redirect('/minhas-arvores');
+            return;
+        }
+        $canDelete = ($tree['user_id'] == $user['id']) || (($user['role'] ?? '') === 'admin');
+        if (!$canDelete) {
+            $this->redirect('/minhas-arvores');
+            return;
+        }
+
+        UploadHelper::deleteOld($tree['photo'], UPLOAD_TREES);
+        $this->treeModel->delete($id);
+        $_SESSION['success'] = 'Árvore removida.';
         $this->redirect('/minhas-arvores');
     }
 
     public function suggest(string $id): void
     {
+        $this->validateCsrf();
         $user = $this->requireAuth();
         if ((int)$user['level_id'] < LEVEL_PRATA) {
             $_SESSION['error'] = 'Nível Prata necessário para sugerir atualizações.';
@@ -167,29 +225,13 @@ class TreeController extends Controller
             $this->redirect('/arvore/editar/' . $id);
             return;
         }
-        $this->logModel->log($user['id'], $id, ContributionLog::ACTION_SUGGEST_UPDATE, 0);
-        $_SESSION['success'] = 'Sugestão registrada. Um moderador pode aprovar (+3 pontos).';
-        $this->redirect('/minhas-arvores');
-    }
 
-    private function handleTreePhotoUpload(): ?string
-    {
-        if (empty($_FILES['photo']['tmp_name']) || $_FILES['photo']['error'] !== UPLOAD_ERR_OK) {
-            return null;
-        }
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        $mime = $finfo->file($_FILES['photo']['tmp_name']);
-        if (!in_array($mime, ALLOWED_IMAGE_TYPES) || $_FILES['photo']['size'] > MAX_FILE_SIZE) {
-            return null;
-        }
-        if (!is_dir(UPLOAD_TREES)) {
-            mkdir(UPLOAD_TREES, 0755, true);
-        }
-        $ext = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION) ?: 'jpg';
-        $name = 'tree_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
-        if (move_uploaded_file($_FILES['photo']['tmp_name'], UPLOAD_TREES . '/' . $name)) {
-            return $name;
-        }
-        return null;
+        // Persistir sugestão na tabela
+        $suggModel = new TreeSuggestion();
+        $suggModel->create($user['id'], $id, $suggestion);
+        $this->logModel->log($user['id'], $id, ContributionLog::ACTION_SUGGEST_UPDATE, 0);
+
+        $_SESSION['success'] = 'Sugestão registrada! Um moderador irá avaliar.';
+        $this->redirect('/minhas-arvores');
     }
 }

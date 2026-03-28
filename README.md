@@ -1,13 +1,17 @@
 # Green Air — Mapeamento Colaborativo de Árvores Urbanas
 
-Aplicação web completa (PHP puro + MySQL + HTML/CSS/JS) para **mapear árvores urbanas** de forma colaborativa: cadastro com foto e GPS, mapa interativo, gamificação por pontos/níveis e painel administrativo com indicadores e gráficos.
+Aplicação web completa (PHP puro + MySQL + Bootstrap 5) para **mapear árvores urbanas** de forma colaborativa: cadastro com foto e GPS, mapa interativo com clusters, gamificação por pontos/níveis, painel de clima expandido e painel administrativo.
 
 ## Visão geral
 
 - **Cadastro de árvores** com foto, espécie, status de preservação, tamanho, idade, observações e **geolocalização automática**.
-- **Mapa interativo (Leaflet)** com pins e filtros; o mapa tenta **centralizar na localização do usuário** e mostra “Você está aqui”.
-- **Dashboard do usuário** com resumo, ranking e **clima + qualidade do ar (OpenWeather)** usando a localização do usuário (com fallback).
-- **Admin (nível Ouro)** com CRUDs e indicadores (Chart.js).
+- **Mapa interativo (Leaflet + MarkerCluster)** com filtros por espécie, status e tamanho; centralização automática no GPS do usuário.
+- **Dashboard do usuário** com progresso de nível, ranking, **clima completo** (temperatura, umidade, vento, pressão, AQI, poluentes, previsão 5 dias) via OpenWeather.
+- **Gamificação** com pontos, níveis (Bronze/Prata/Ouro), ranking semanal/mensal/geral e pódio visual.
+- **Sugestões de atualização** de árvores — aprovadas por moderadores com bonificação de pontos.
+- **Notificações** internas para o usuário (boas-vindas, sugestões aprovadas, etc.).
+- **Painel admin** com dashboard de gráficos, gerenciamento de usuários (com roles), árvores, espécies, status, sugestões e configurações.
+- **Design mobile-first** com Bootstrap 5.3, glassmorphism, dark mode e bottom navigation.
 
 ## Requisitos
 
@@ -19,15 +23,19 @@ Aplicação web completa (PHP puro + MySQL + HTML/CSS/JS) para **mapear árvores
 
 ### 1) Banco de dados
 
-Importe `database.sql` no MySQL (phpMyAdmin ou CLI). Isso cria o banco, tabelas e o usuário admin (se não existir).
+Importe `database.sql` no MySQL (cria banco, tabelas e seeds):
 
 ```bash
 mysql -u root -p < database.sql
 ```
 
-### 2) Variáveis de ambiente (`.env`)
+Em seguida, aplique a migração v2.0:
 
-Crie o `.env` na raiz do projeto:
+```bash
+mysql -u root -p green_air < database/migration_v2.sql
+```
+
+### 2) Variáveis de ambiente (`.env`)
 
 ```bash
 cp .env.example .env
@@ -35,7 +43,7 @@ cp .env.example .env
 
 Preencha pelo menos:
 - `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`
-- `OPENWEATHER_API_KEY` (para clima/qualidade do ar)
+- `OPENWEATHER_API_KEY` (para clima/qualidade do ar/poluentes/previsão)
 
 O arquivo `.env` **não deve ser versionado** (já está no `.gitignore`).
 
@@ -44,13 +52,13 @@ O arquivo `.env` **não deve ser versionado** (já está no `.gitignore`).
 O ponto de entrada é `public/index.php`.
 
 - **Recomendado (produção)**: configure o DocumentRoot para a pasta `public`.
-- **Dev no XAMPP**: acesse via URL que aponte para a pasta `public`, por exemplo: `http://localhost/Desenvolvimentos/green-air/public/`.
+- **Dev no XAMPP**: acesse via `http://localhost/Desenvolvimentos/green-air/public/`.
 
 Se rotas como `/login` retornarem 404, veja `docs/TROUBLESHOOTING.md`.
 
 ### 4) Admin
 
-Usuário administrador (nível Ouro):
+Usuário administrador (role `admin`):
 - **E-mail**: `admin@greenair.com`
 - **Senha**: `admin123`
 
@@ -66,52 +74,89 @@ php scripts/seed_admin.php
 public/               # Front controller, assets e .htaccess
   index.php
   assets/
+    css/style.css     # Design system (Bootstrap 5 + custom)
+    js/main.js        # Dark mode, toasts, photo preview
+    js/clima.js       # Widget de clima expandido
+    js/map.js         # Mapa com MarkerCluster
 app/
-  controllers/
-  models/
+  controllers/        # Controllers (lógica de fluxo + CSRF)
+  models/             # Models (acesso ao banco via PDO)
+  helpers/            # UploadHelper, CacheHelper
   views/
+    layout/           # header.php (navbar), footer.php (bottom nav)
+    auth/             # Login, registro, forgot, reset
+    dashboard/        # Painel do usuário
+    tree/             # CRUD de árvores + detalhes
+    map/              # Mapa interativo
+    user/             # Perfil
+    ranking/          # Ranking com pódio
+    admin/            # Admin layout + todas as views
+    errors/           # 404
 config/
   env.php             # Loader do .env + helper env()
   database.php        # PDO
-  app.php             # Constantes e autoload
+  app.php             # Constantes, sessão segura e autoload
 routes/
   web.php             # Tabela de rotas
 uploads/
   trees/
   users/
+storage/
+  cache/              # Cache de APIs (file-based)
+database/
+  migration_v2.sql    # Migração v2.0
 docs/                 # Documentação detalhada
-database.sql
+database.sql          # Schema inicial
 ```
 
 ## Rotas principais
 
-- Público: `/`, `/mapa`
-- Auth: `/login`, `/registro`, `/logout`, `/esqueci-senha`, `/redefinir-senha`
-- Usuário: `/painel`, `/cadastrar-arvore`, `/minhas-arvores`, `/perfil`, `/ranking`
-- Admin (Ouro): `/admin` e `/admin/*`
+- **Público**: `/`, `/mapa`, `/arvore/{id}`
+- **Auth**: `/login`, `/registro`, `/logout`, `/esqueci-senha`, `/redefinir-senha`
+- **Usuário**: `/painel`, `/cadastrar-arvore`, `/minhas-arvores`, `/perfil`, `/ranking`
+- **Admin** (role `admin`): `/admin` e `/admin/*` (usuarios, arvores, especies, status, sugestoes, contribuicoes, configuracoes)
 
 ## APIs internas
 
-- `GET /api/mapa/arvores` — lista árvores para o mapa (com filtros)
-- `GET /api/clima?lat=...&lon=...` — clima/umidade/AQI + previsão (usa localização do usuário; fallback para `OPENWEATHER_CITY`)
+- `GET /api/mapa/arvores` — lista árvores para o mapa (público, com filtros)
+- `GET /api/clima?lat=...&lon=...` — clima + AQI + poluentes + previsão 5 dias (requer login; cache 10min)
+- `GET /api/notificacoes` — notificações do usuário (requer login)
+- `POST /api/notificacoes/ler/{id}` — marcar notificação como lida (requer login + CSRF)
 
 Detalhes em `docs/API.md`.
 
-## Segurança (resumo)
+## Segurança (v2.0)
 
-- Prepared statements (PDO) para evitar SQL injection
-- Senhas com `password_hash()`
-- Upload de imagens com validação de tamanho/tipo MIME e nomes aleatórios
+- **CSRF** em todos os formulários POST (token com `random_bytes(32)` + `hash_equals`)
+- **Rate limiting** no login (5 tentativas / 15 min, por email+IP)
+- **RBAC** com coluna `role` (user/moderator/admin) substituindo nível Ouro para acesso admin
+- **Sessão segura** (httponly, samesite=Lax, strict_mode, regenerate_id no login)
+- **Upload centralizado** via `UploadHelper` (validação MIME, tamanho, nomes aleatórios)
+- Prepared statements (PDO), `password_hash()`, XSS-safe no mapa (textContent)
 
 Detalhes em `docs/SECURITY.md`.
+
+## Tecnologias (v2.0)
+
+| Camada | Tecnologia |
+|--------|-----------|
+| Backend | PHP 8.x puro (MVC) |
+| Banco | MySQL / MariaDB |
+| Frontend | Bootstrap 5.3 + Bootstrap Icons (CDN) |
+| Fontes | Inter (Google Fonts) |
+| Animações | AOS — Animate On Scroll (CDN) |
+| Mapa | Leaflet + MarkerCluster (CDN) |
+| Gráficos | Chart.js (CDN, admin) |
+| Clima | OpenWeather API (weather + air pollution + forecast) |
 
 ## Documentação
 
 - `docs/INSTALLATION.md` — instalação (XAMPP/Apache/Nginx)
 - `docs/CONFIGURATION.md` — `.env` e configurações
-- `docs/ARCHITECTURE.md` — MVC, rotas e fluxo da aplicação
-- `docs/API.md` — endpoints, parâmetros e exemplos
-- `docs/DATABASE.md` — esquema, relacionamentos e seeds
-- `docs/SECURITY.md` — decisões e recomendações
+- `docs/ARCHITECTURE.md` — MVC, rotas, controllers, helpers e fluxo
+- `docs/API.md` — endpoints, parâmetros e exemplos expandidos
+- `docs/DATABASE.md` — esquema completo (incluindo tabelas v2.0)
+- `docs/SECURITY.md` — CSRF, rate limiting, RBAC e recomendações
 - `docs/DEPLOYMENT.md` — deploy e checklist de produção
-- `docs/TROUBLESHOOTING.md` — problemas comuns (404, mod_rewrite, geolocalização, e-mail)
+- `docs/TROUBLESHOOTING.md` — problemas comuns
+- `docs/CHANGELOG.md` — histórico de alterações

@@ -25,7 +25,7 @@ Usadas em `config/database.php`:
 - `DB_USER` (padrão `root`)
 - `DB_PASS` (padrão vazio)
 
-### OpenWeather (clima e qualidade do ar)
+### OpenWeather (clima, qualidade do ar, poluentes, previsão)
 
 Usadas em `config/app.php` e no endpoint `GET /api/clima`:
 
@@ -33,6 +33,23 @@ Usadas em `config/app.php` e no endpoint `GET /api/clima`:
 - `OPENWEATHER_CITY` (fallback quando não há latitude/longitude; padrão `São Paulo`)
 
 O widget de clima tenta usar **geolocalização do navegador** e envia `lat/lon` para o backend. Se falhar (permissão negada, timeout, etc), usa `OPENWEATHER_CITY`.
+
+> **APIs utilizadas**: Weather (current), Air Pollution (AQI + poluentes), Forecast 5 days/3h. Todas requerem a mesma API key.
+
+## Constantes de `config/app.php`
+
+As seguintes constantes são definidas e podem ser ajustadas:
+
+| Constante | Valor Padrão | Descrição |
+|-----------|-------------|-----------|
+| `SESSION_LIFETIME` | 7200 | Tempo de sessão em segundos (2h) |
+| `SESSION_NAME` | `GREENAIR_SID` | Nome do cookie de sessão |
+| `MAX_FILE_SIZE` | 5MB | Tamanho máximo de upload |
+| `POINTS_NEW_TREE` | 10 | Pontos por cadastrar árvore |
+| `POINTS_SUGGESTION_APPROVED` | 3 | Pontos por sugestão aprovada |
+| `CACHE_CLIMATE_TTL` | 600 | TTL do cache de clima (10 min) |
+| `LOGIN_MAX_ATTEMPTS` | 5 | Máx. tentativas de login |
+| `LOGIN_LOCKOUT_MINUTES` | 15 | Minutos de bloqueio após exceder |
 
 ## Formato e aspas
 
@@ -56,7 +73,6 @@ Existe uma tela de admin em `/admin/configuracoes` que salva pares chave/valor n
 Importante:
 
 - **As credenciais do OpenWeather usadas pelo sistema vêm do `.env`** (`OPENWEATHER_API_KEY` e `OPENWEATHER_CITY`).
-- As chaves salvas em `settings` (ex.: `openweather_api_key`) hoje são armazenadas, mas não substituem automaticamente o `.env`.
+- As chaves salvas em `settings` (ex.: `openweather_api_key`) são armazenadas, mas não substituem automaticamente o `.env`.
 
-Se você quiser que o admin controle a chave/cidade, isso exige uma pequena alteração para o backend ler `Setting::get(...)` como fallback.
-
+Se você quiser que o admin controle a chave/cidade, isso exige uma alteração para o backend ler `Setting::get(...)` como fallback.

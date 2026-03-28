@@ -28,15 +28,33 @@ mysql -u root -p < database.sql
 
 Isso cria o banco `green_air`, as tabelas e o usuário admin.
 
-### 3) Configurar o `.env`
+### 3) Aplicar migração v2.0
+
+Execute o script de migração que adiciona novas tabelas e colunas:
+
+```bash
+mysql -u root -p green_air < database/migration_v2.sql
+```
+
+> **Nota**: a migração é idempotente — pode ser executada mais de uma vez sem efeitos colaterais (erros de "duplicate column/key" são esperados na reaplicação).
+
+### 4) Configurar o `.env`
 
 Na raiz do projeto, copie `.env.example` para `.env` e preencha suas credenciais.
 
 Detalhes em `CONFIGURATION.md`.
 
-### 4) Acessar no navegador
+### 5) Garantir permissões de escrita
 
-Você pode rodar de duas formas:
+O projeto precisa escrever em:
+
+- `uploads/trees/`
+- `uploads/users/`
+- `storage/cache/`
+
+Em Windows (XAMPP) normalmente funciona sem ajustes. Em Linux, ajuste ownership/permissões conforme o usuário do PHP/Apache.
+
+### 6) Acessar no navegador
 
 #### Opção A (mais simples no XAMPP)
 
@@ -46,11 +64,7 @@ Mantenha o DocumentRoot do Apache em `htdocs` e acesse a pasta `public` pela URL
 
 #### Opção B (recomendado): DocumentRoot apontando para `public/`
 
-Crie um VirtualHost apontando para:
-
-- `...\green-air\public`
-
-Assim a URL fica mais limpa (sem `/public`).
+Crie um VirtualHost apontando para `...green-air/public`. Assim a URL fica mais limpa (sem `/public`).
 
 ## mod_rewrite e `.htaccess` (rotas amigáveis)
 
@@ -66,19 +80,11 @@ Se você ver **404** ao acessar `/login`, `/mapa`, `/painel`, etc:
 
 Checklist e passos detalhados em `TROUBLESHOOTING.md`.
 
-## Permissões da pasta `uploads/`
-
-O projeto salva imagens em:
-
-- `uploads/trees/`
-- `uploads/users/`
-
-Em Windows (XAMPP) normalmente funciona sem ajustes. Em Linux, garanta permissão de escrita no diretório `uploads/`.
-
 ## Usuário admin
 
 - **E-mail**: `admin@greenair.com`
 - **Senha**: `admin123`
+- **Role**: `admin` (acesso ao painel administrativo)
 
 Se por algum motivo o admin não for criado, rode:
 
@@ -86,3 +92,12 @@ Se por algum motivo o admin não for criado, rode:
 php scripts/seed_admin.php
 ```
 
+## Dependências externas (CDN)
+
+O projeto carrega as seguintes bibliotecas via CDN (não precisa instalar nada):
+
+- Bootstrap 5.3 + Bootstrap Icons
+- Google Fonts (Inter)
+- AOS (Animate On Scroll)
+- Leaflet + MarkerCluster
+- Chart.js (admin)

@@ -1,7 +1,6 @@
 <?php
 /**
- * Rotas da aplicação (front controller usa este array)
- * Green Air - Mapeamento de Árvores Urbanas
+ * Rotas da aplicação - Green Air v2.0
  */
 
 return [
@@ -10,16 +9,20 @@ return [
     'GET /login'               => ['AuthController', 'loginForm'],
     'POST /login'              => ['AuthController', 'login'],
     'GET /logout'              => ['AuthController', 'logout'],
+    'POST /logout'             => ['AuthController', 'logout'],
     'GET /registro'            => ['AuthController', 'registerForm'],
-    'POST /registro'            => ['AuthController', 'register'],
+    'POST /registro'           => ['AuthController', 'register'],
     'GET /esqueci-senha'       => ['AuthController', 'forgotForm'],
     'POST /esqueci-senha'      => ['AuthController', 'forgot'],
     'GET /redefinir-senha'     => ['AuthController', 'resetForm'],
     'POST /redefinir-senha'    => ['AuthController', 'resetPassword'],
 
-    // Mapa público (visualização)
+    // Mapa público
     'GET /mapa'                => ['MapController', 'index'],
     'GET /api/mapa/arvores'    => ['MapController', 'apiTrees'],
+
+    // Visualização pública de árvore
+    'GET /arvore/{id}'         => ['TreeController', 'show'],
 
     // Área logada (usuário)
     'GET /painel'              => ['DashboardController', 'index'],
@@ -28,15 +31,18 @@ return [
     'POST /cadastrar-arvore'   => ['TreeController', 'store'],
     'GET /arvore/editar/{id}'  => ['TreeController', 'edit'],
     'POST /arvore/atualizar/{id}' => ['TreeController', 'update'],
+    'POST /arvore/excluir/{id}'   => ['TreeController', 'delete'],
     'POST /arvore/sugerir/{id}'   => ['TreeController', 'suggest'],
     'GET /perfil'              => ['UserController', 'profile'],
     'POST /perfil'             => ['UserController', 'updateProfile'],
     'GET /ranking'             => ['RankingController', 'index'],
 
-    // API clima (dashboard)
+    // API
     'GET /api/clima'           => ['DashboardController', 'apiClima'],
+    'GET /api/notificacoes'    => ['DashboardController', 'apiNotifications'],
+    'POST /api/notificacoes/ler/{id}' => ['DashboardController', 'markNotificationRead'],
 
-    // Admin (CRUD completo)
+    // Admin
     'GET /admin'               => ['AdminDashboardController', 'index'],
     'GET /admin/usuarios'      => ['AdminUserController', 'index'],
     'GET /admin/usuarios/novo' => ['AdminUserController', 'create'],
@@ -61,6 +67,11 @@ return [
     'POST /admin/status/excluir/{id}' => ['AdminTreeStatusController', 'delete'],
 
     'GET /admin/contribuicoes' => ['AdminContributionController', 'index'],
+
+    'GET /admin/sugestoes'     => ['AdminSuggestionController', 'index'],
+    'POST /admin/sugestoes/aprovar/{id}' => ['AdminSuggestionController', 'approve'],
+    'POST /admin/sugestoes/rejeitar/{id}' => ['AdminSuggestionController', 'reject'],
+
     'GET /admin/configuracoes' => ['AdminSettingsController', 'index'],
     'POST /admin/configuracoes' => ['AdminSettingsController', 'save'],
 ];

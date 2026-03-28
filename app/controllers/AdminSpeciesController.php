@@ -10,6 +10,7 @@ class AdminSpeciesController extends Controller
 
     public function store(): void
     {
+        $this->validateCsrf();
         $this->requireAdmin();
         $name = trim(filter_var($_POST['name'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS));
         $scientific = trim(filter_var($_POST['scientific_name'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS)) ?: null;
@@ -26,6 +27,7 @@ class AdminSpeciesController extends Controller
 
     public function update(string $id): void
     {
+        $this->validateCsrf();
         $this->requireAdmin();
         $id = (int)$id;
         $name = trim(filter_var($_POST['name'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS));
@@ -43,8 +45,17 @@ class AdminSpeciesController extends Controller
 
     public function delete(string $id): void
     {
+        $this->validateCsrf();
         $this->requireAdmin();
         $id = (int)$id;
+        // Verificar dependências
+        $treeModel = new Tree();
+        $count = $treeModel->countBySpeciesId($id);
+        if ($count > 0) {
+            $_SESSION['admin_error'] = "Não é possível excluir: {$count} árvore(s) vinculada(s) a esta espécie.";
+            $this->redirect('/admin/especies');
+            return;
+        }
         $model = new TreeSpecies();
         $model->delete($id);
         $_SESSION['admin_success'] = 'Espécie removida.';

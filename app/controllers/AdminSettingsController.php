@@ -10,6 +10,7 @@ class AdminSettingsController extends Controller
 
     public function save(): void
     {
+        $this->validateCsrf();
         $this->requireAdmin();
         $model = new Setting();
         foreach ($_POST as $key => $value) {

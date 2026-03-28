@@ -150,4 +150,10 @@ class Tree extends Model
         $r = $this->fetchOne("SELECT COUNT(*) as c FROM trees t JOIN tree_status ts ON t.status_id = ts.id WHERE ts.name LIKE '%Risco%' OR ts.name LIKE '%Queda%'");
         return (int)($r['c'] ?? 0);
     }
+
+    public function countBySpeciesId(int $speciesId): int
+    {
+        $r = $this->fetchOne('SELECT COUNT(*) as c FROM trees WHERE species_id = ?', [$speciesId]);
+        return (int)($r['c'] ?? 0);
+    }
 }
