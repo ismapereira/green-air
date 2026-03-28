@@ -84,7 +84,7 @@ $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
 <!-- Sidebar -->
 <nav class="admin-sidebar" id="admin-sidebar">
     <button class="sidebar-close" id="sidebar-close"><i class="bi bi-x-lg"></i></button>
-    <div class="brand">🌳 Green Air Admin</div>
+    <div class="brand"><i class="bi bi-tree-fill me-1"></i> Green Air Admin</div>
     <a href="<?= BASE_URL ?>admin" class="nav-link <?= strpos($currentPath, '/admin') !== false && strpos($currentPath, '/admin/') === false ? 'active' : '' ?>"><i class="bi bi-grid"></i>Dashboard</a>
     <a href="<?= BASE_URL ?>admin/usuarios" class="nav-link <?= strpos($currentPath, 'usuarios') !== false ? 'active' : '' ?>"><i class="bi bi-people"></i>Usuários</a>
     <a href="<?= BASE_URL ?>admin/arvores" class="nav-link <?= strpos($currentPath, 'arvores') !== false ? 'active' : '' ?>"><i class="bi bi-tree"></i>Árvores</a>

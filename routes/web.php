@@ -6,6 +6,8 @@
 return [
     // Públicas
     'GET /'                    => ['HomeController', 'index'],
+    'GET /termos'              => ['HomeController', 'terms'],
+    'GET /privacidade'         => ['HomeController', 'privacy'],
     'GET /login'               => ['AuthController', 'loginForm'],
     'POST /login'              => ['AuthController', 'login'],
     'GET /logout'              => ['AuthController', 'logout'],

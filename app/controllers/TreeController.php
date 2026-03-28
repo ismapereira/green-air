@@ -109,7 +109,7 @@ class TreeController extends Controller
         unset($freshUser['password']);
         $_SESSION['user'] = $freshUser;
 
-        $_SESSION['success'] = 'Árvore cadastrada com sucesso! +' . POINTS_NEW_TREE . ' pontos 🌳';
+        $_SESSION['success'] = 'Árvore cadastrada com sucesso! +' . POINTS_NEW_TREE . ' pontos';
         $this->redirect('/minhas-arvores');
     }
 

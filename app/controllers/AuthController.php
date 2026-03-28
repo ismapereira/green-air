@@ -132,7 +132,7 @@ class AuthController extends Controller
 
         // Notificação de boas-vindas
         $notif = new Notification();
-        $notif->create($userId, 'welcome', 'Bem-vindo ao Green Air! 🌳', 'Comece cadastrando sua primeira árvore e ganhe pontos.', '/cadastrar-arvore');
+        $notif->create($userId, 'welcome', 'Bem-vindo ao Green Air!', 'Comece cadastrando sua primeira árvore e ganhe pontos.', '/cadastrar-arvore');
 
         $_SESSION['register_success'] = true;
         $this->redirect('/login');
@@ -158,11 +158,87 @@ class AuthController extends Controller
             $token = bin2hex(random_bytes(32));
             $this->resetModel->create($email, $token);
             $link = BASE_URL . 'redefinir-senha?token=' . $token;
-            $msg = "Olá,\n\nAcesse o link para redefinir sua senha:\n$link\n\nVálido por 24 horas.";
-            @mail($email, 'Green Air - Redefinir senha', $msg);
+
+            // Attempt to send email
+            $emailSent = $this->sendResetEmail($email, $user['name'] ?? '', $link);
+
+            // In development: if mail fails, show the link directly
+            if (!$emailSent && env('APP_ENV', 'development') === 'development') {
+                $_SESSION['forgot_message'] = [
+                    'type' => 'info',
+                    'text' => 'Ambiente de desenvolvimento detectado. Use o link: ' . $link
+                ];
+                $_SESSION['reset_link'] = $link;
+                $this->redirect('/esqueci-senha');
+                return;
+            }
         }
         $_SESSION['forgot_message'] = ['type' => 'success', 'text' => 'Se o e-mail existir, você receberá o link para redefinir a senha.'];
         $this->redirect('/esqueci-senha');
+    }
+
+    /**
+     * Send password reset email using PHPMailer or native mail()
+     */
+    private function sendResetEmail(string $to, string $name, string $link): bool
+    {
+        $subject = 'Green Air - Redefinir senha';
+        $firstName = explode(' ', $name)[0] ?: 'Usuário';
+
+        // HTML email body
+        $htmlBody = '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="font-family:Arial,sans-serif;background:#f0fdf4;margin:0;padding:20px">';
+        $htmlBody .= '<div style="max-width:500px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1)">';
+        $htmlBody .= '<div style="background:linear-gradient(135deg,#059669,#047857);padding:2rem;text-align:center;color:#fff">';
+        $htmlBody .= '<h1 style="margin:0;font-size:1.5rem">Green Air</h1>';
+        $htmlBody .= '<p style="margin:0.5rem 0 0;opacity:0.9">Redefinição de Senha</p>';
+        $htmlBody .= '</div>';
+        $htmlBody .= '<div style="padding:2rem">';
+        $htmlBody .= '<p>Olá, <strong>' . htmlspecialchars($firstName) . '</strong>!</p>';
+        $htmlBody .= '<p>Recebemos uma solicitação para redefinir a senha da sua conta no Green Air.</p>';
+        $htmlBody .= '<p style="text-align:center;margin:1.5rem 0">';
+        $htmlBody .= '<a href="' . htmlspecialchars($link) . '" style="display:inline-block;background:#059669;color:#fff;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:bold">Redefinir Minha Senha</a>';
+        $htmlBody .= '</p>';
+        $htmlBody .= '<p style="color:#64748b;font-size:0.9rem">Este link é válido por <strong>24 horas</strong>. Se você não solicitou a redefinição, pode ignorar este e-mail.</p>';
+        $htmlBody .= '<hr style="border:none;border-top:1px solid #e5e7eb;margin:1.5rem 0">';
+        $htmlBody .= '<p style="color:#94a3b8;font-size:0.8rem">Se o botão não funcionar, copie e cole este link no seu navegador:<br><a href="' . htmlspecialchars($link) . '" style="color:#059669;word-break:break-all">' . htmlspecialchars($link) . '</a></p>';
+        $htmlBody .= '</div></div></body></html>';
+
+        // Plain text fallback
+        $textBody = "Olá, {$firstName}!\n\n";
+        $textBody .= "Recebemos uma solicitação para redefinir a senha da sua conta no Green Air.\n\n";
+        $textBody .= "Acesse o link abaixo para redefinir sua senha:\n{$link}\n\n";
+        $textBody .= "Este link é válido por 24 horas.\n";
+        $textBody .= "Se você não solicitou a redefinição, pode ignorar este e-mail.\n";
+
+        // Try sending with mail()
+        $headers = "MIME-Version: 1.0\r\n";
+        $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+        $headers .= "From: Green Air <noreply@greenair.com>\r\n";
+        $headers .= "Reply-To: noreply@greenair.com\r\n";
+        $headers .= "X-Mailer: GreenAir/2.0\r\n";
+
+        $sent = @mail($to, $subject, $htmlBody, $headers);
+
+        // If mail() failed, try saving to file as fallback (development)
+        if (!$sent) {
+            $this->saveEmailToFile($to, $subject, $textBody);
+        }
+
+        return $sent;
+    }
+
+    /**
+     * Save email to file for development environments where mail() is unavailable
+     */
+    private function saveEmailToFile(string $to, string $subject, string $body): void
+    {
+        $dir = ROOT_PATH . '/storage/emails';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        $filename = $dir . '/' . date('Y-m-d_H-i-s') . '_' . preg_replace('/[^a-z0-9]/', '_', $to) . '.txt';
+        $content = "To: {$to}\nSubject: {$subject}\nDate: " . date('Y-m-d H:i:s') . "\n\n{$body}";
+        file_put_contents($filename, $content);
     }
 
     public function resetForm(): void

@@ -131,7 +131,7 @@ unset($_SESSION['login_error'], $_SESSION['register_success']);
     <a href="<?= BASE_URL ?>" class="auth-back"><i class="bi bi-arrow-left"></i> Voltar ao início</a>
 
     <div class="auth-brand">
-        <span class="icon">🌳</span>
+        <i class="bi bi-tree-fill icon" style="color:#10B981"></i>
         <h1>Green Air</h1>
         <p>Entre na sua conta</p>
     </div>

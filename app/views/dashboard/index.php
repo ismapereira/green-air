@@ -13,7 +13,7 @@ require ROOT_PATH . '/app/views/layout/header.php';
     <!-- Welcome -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h4 class="fw-bold mb-0">Olá, <?= htmlspecialchars(explode(' ', $user['name'])[0]) ?>! 👋</h4>
+            <h4 class="fw-bold mb-0">Olá, <?= htmlspecialchars(explode(' ', $user['name'])[0]) ?>!</h4>
             <small class="text-muted"><?= htmlspecialchars($user['level_name'] ?? 'Bronze') ?> · <?= (int)($user['points'] ?? 0) ?> pontos</small>
         </div>
         <a href="<?= BASE_URL ?>cadastrar-arvore" class="btn btn-success d-none d-md-inline-flex align-items-center gap-2">

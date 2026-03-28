@@ -31,7 +31,7 @@
         <div class="row g-4 text-center text-md-start mb-4">
             <div class="col-md-4">
                 <div class="d-flex align-items-center gap-2 justify-content-center justify-content-md-start mb-2">
-                    <span style="font-size:1.5rem">🌳</span>
+                    <i class="bi bi-tree-fill fs-4" style="color:var(--ga-primary)"></i>
                     <span class="fw-bold fs-5 text-gradient">Green Air</span>
                 </div>
                 <p class="mb-0 small">Mapeamento colaborativo de árvores urbanas para uma cidade mais verde e sustentável.</p>
@@ -64,10 +64,10 @@
         </div>
         <hr style="border-color: var(--ga-border); margin: 0 0 1rem 0;">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
-            <p class="mb-0 small text-muted">&copy; <?= date('Y') ?> Green Air. Feito com 💚 para o meio ambiente.</p>
+            <p class="mb-0 small text-muted">&copy; <?= date('Y') ?> Green Air. Feito com <i class="bi bi-heart-fill" style="color:var(--ga-primary)"></i> para o meio ambiente.</p>
             <div class="d-flex gap-3 small">
-                <a href="#" class="text-muted">Termos</a>
-                <a href="#" class="text-muted">Privacidade</a>
+                <a href="<?= BASE_URL ?>termos" class="text-muted">Termos</a>
+                <a href="<?= BASE_URL ?>privacidade" class="text-muted">Privacidade</a>
             </div>
         </div>
     </div>

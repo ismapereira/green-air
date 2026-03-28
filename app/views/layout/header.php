@@ -40,7 +40,7 @@ $route = '/' . ltrim($route, '/');
 <nav class="navbar navbar-expand-lg ga-navbar fixed-top">
     <div class="container">
         <a class="navbar-brand" href="<?= BASE_URL ?>">
-            <span class="brand-icon">🌳</span> Green Air
+            <i class="bi bi-tree-fill brand-icon"></i> Green Air
         </a>
 
         <!-- Mobile: actions always visible -->

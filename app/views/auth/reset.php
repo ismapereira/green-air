@@ -51,7 +51,7 @@ $token = $token ?? '';
 <body>
 <div class="auth-wrapper">
     <div class="auth-brand">
-        <span class="icon">🔐</span>
+        <i class="bi bi-shield-lock-fill icon" style="color:#F59E0B"></i>
         <h1>Nova Senha</h1>
         <p>Defina sua nova senha</p>
     </div>

@@ -112,7 +112,7 @@ a:hover { color: var(--ga-primary-dark); }
     align-items: center;
     gap: 0.4rem;
 }
-.ga-navbar .navbar-brand .brand-icon { font-size: 1.5rem; }
+.ga-navbar .navbar-brand .brand-icon { font-size: 1.4rem; color: var(--ga-primary); }
 .ga-navbar .nav-link {
     color: var(--ga-text-muted) !important;
     font-weight: 500;

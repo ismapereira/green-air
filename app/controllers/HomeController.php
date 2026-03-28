@@ -10,4 +10,14 @@ class HomeController extends Controller
         }
         $this->view('home.index');
     }
+
+    public function terms(): void
+    {
+        $this->view('home.terms');
+    }
+
+    public function privacy(): void
+    {
+        $this->view('home.privacy');
+    }
 }

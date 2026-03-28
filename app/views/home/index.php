@@ -34,7 +34,7 @@ require ROOT_PATH . '/app/views/layout/header.php';
                 <span class="stat-label">Contribuidores</span>
             </div>
             <div class="hero-stat">
-                <span class="stat-num">🌍</span>
+                <span class="stat-num"><i class="bi bi-globe2" style="font-size:1.8rem"></i></span>
                 <span class="stat-label">Colaborativo</span>
             </div>
         </div>
@@ -118,7 +118,7 @@ require ROOT_PATH . '/app/views/layout/header.php';
 <?php if (!$currentUser): ?>
 <section class="py-5" data-aos="fade-up">
     <div class="container text-center">
-        <h2 class="fw-bold mb-3">Faça parte dessa mudança 🌿</h2>
+        <h2 class="fw-bold mb-3">Faça parte dessa mudança <i class="bi bi-leaf" style="color:var(--ga-primary)"></i></h2>
         <p class="text-muted mb-4">Junte-se a <?= number_format($totalUsers) ?> contribuidores que estão mapeando a arborização urbana.</p>
         <a href="<?= BASE_URL ?>registro" class="btn btn-success btn-lg"><i class="bi bi-person-plus me-2"></i>Criar Conta Gratuita</a>
     </div>

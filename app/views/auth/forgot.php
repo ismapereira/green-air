@@ -58,14 +58,29 @@ $message = $message ?? null;
     <a href="<?= BASE_URL ?>login" class="auth-back"><i class="bi bi-arrow-left"></i> Voltar ao login</a>
 
     <div class="auth-brand">
-        <span class="icon">🔑</span>
+        <i class="bi bi-key-fill icon" style="color:#F59E0B"></i>
         <h1>Recuperar Senha</h1>
         <p>Informe seu e-mail para receber o link</p>
     </div>
 
     <div class="auth-card">
         <?php if ($message): ?>
-            <div class="alert alert-<?= $message['type'] === 'success' ? 'success' : 'danger' ?> py-2 mb-3"><?= htmlspecialchars($message['text']) ?></div>
+            <?php
+                $alertType = 'danger';
+                if ($message['type'] === 'success') $alertType = 'success';
+                if ($message['type'] === 'info') $alertType = 'info';
+            ?>
+            <div class="alert alert-<?= $alertType ?> py-2 mb-3">
+                <?php if ($message['type'] === 'info' && !empty($_SESSION['reset_link'])): ?>
+                    <div class="mb-2"><i class="bi bi-info-circle me-1"></i> Ambiente de desenvolvimento — e-mail não enviado.</div>
+                    <a href="<?= htmlspecialchars($_SESSION['reset_link']) ?>" class="btn btn-sm btn-success w-100">
+                        <i class="bi bi-arrow-right-circle me-1"></i> Redefinir Senha Agora
+                    </a>
+                    <?php unset($_SESSION['reset_link']); ?>
+                <?php else: ?>
+                    <?= htmlspecialchars($message['text']) ?>
+                <?php endif; ?>
+            </div>
         <?php endif; ?>
 
         <form method="post" action="<?= BASE_URL ?>esqueci-senha">
