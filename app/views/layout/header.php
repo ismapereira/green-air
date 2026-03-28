@@ -43,6 +43,7 @@ $route = '/' . ltrim($route, '/');
             <span class="brand-icon">🌳</span> Green Air
         </a>
 
+        <!-- Mobile: actions always visible -->
         <div class="d-flex align-items-center gap-2 d-lg-none">
             <?php if ($currentUser): ?>
             <a href="<?= BASE_URL ?>api/notificacoes" class="nav-link position-relative p-1" id="mobile-notif-btn" title="Notificações">
@@ -54,6 +55,9 @@ $route = '/' . ltrim($route, '/');
             <?php endif; ?>
             <button class="theme-toggle" id="theme-toggle-mobile" title="Alternar tema">
                 <i class="bi bi-moon-fill"></i>
+            </button>
+            <button class="navbar-toggler border-0 p-1" type="button" data-bs-toggle="collapse" data-bs-target="#navContent" aria-controls="navContent" aria-expanded="false" aria-label="Menu">
+                <i class="bi bi-list fs-4" style="color:var(--ga-text-muted)"></i>
             </button>
         </div>
 
@@ -80,6 +84,28 @@ $route = '/' . ltrim($route, '/');
                         <i class="bi bi-trophy me-1"></i>Ranking
                     </a>
                 </li>
+                <!-- Mobile-only menu items -->
+                <li class="nav-item d-lg-none">
+                    <a class="nav-link" href="<?= BASE_URL ?>perfil"><i class="bi bi-person me-1"></i>Perfil</a>
+                </li>
+                <li class="nav-item d-lg-none">
+                    <a class="nav-link" href="<?= BASE_URL ?>minhas-arvores"><i class="bi bi-tree me-1"></i>Minhas Árvores</a>
+                </li>
+                <li class="nav-item d-lg-none">
+                    <a class="nav-link" href="<?= BASE_URL ?>cadastrar-arvore"><i class="bi bi-plus-circle me-1"></i>Cadastrar Árvore</a>
+                </li>
+                <?php if (($currentUser['role'] ?? '') === 'admin'): ?>
+                <li class="nav-item d-lg-none">
+                    <a class="nav-link" href="<?= BASE_URL ?>admin"><i class="bi bi-shield-check me-1"></i>Painel Admin</a>
+                </li>
+                <?php endif; ?>
+                <li class="nav-item d-lg-none">
+                    <form method="post" action="<?= BASE_URL ?>logout">
+                        <input type="hidden" name="_csrf" value="<?= $csrfToken ?>">
+                        <button type="submit" class="nav-link w-100 text-start border-0 bg-transparent"><i class="bi bi-box-arrow-right me-1"></i>Sair</button>
+                    </form>
+                </li>
+                <!-- Desktop-only items -->
                 <li class="nav-item d-none d-lg-block">
                     <a class="nav-link position-relative" href="#" id="desktop-notif-btn" title="Notificações">
                         <i class="bi bi-bell"></i>
@@ -115,11 +141,12 @@ $route = '/' . ltrim($route, '/');
                     </ul>
                 </li>
                 <?php else: ?>
+                <!-- Not logged in -->
                 <li class="nav-item">
                     <a class="nav-link" href="<?= BASE_URL ?>login"><i class="bi bi-box-arrow-in-right me-1"></i>Entrar</a>
                 </li>
-                <li class="nav-item d-none d-lg-block">
-                    <a class="btn btn-success btn-sm ms-2" href="<?= BASE_URL ?>registro">Cadastre-se</a>
+                <li class="nav-item">
+                    <a class="btn btn-success btn-sm ms-lg-2" href="<?= BASE_URL ?>registro">Cadastre-se</a>
                 </li>
                 <?php endif; ?>
                 <li class="nav-item d-none d-lg-block">

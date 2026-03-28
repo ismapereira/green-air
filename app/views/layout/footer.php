@@ -26,28 +26,50 @@
 <?php endif; ?>
 
 <!-- Footer -->
-<footer class="ga-footer d-none d-md-block">
+<footer class="ga-footer">
     <div class="container">
-        <div class="row g-3 text-center text-md-start">
+        <div class="row g-4 text-center text-md-start mb-4">
             <div class="col-md-4">
-                <strong class="text-gradient">🌳 Green Air</strong>
-                <p class="mb-0 mt-1">Mapeamento colaborativo de árvores urbanas para uma cidade mais verde.</p>
+                <div class="d-flex align-items-center gap-2 justify-content-center justify-content-md-start mb-2">
+                    <span style="font-size:1.5rem">🌳</span>
+                    <span class="fw-bold fs-5 text-gradient">Green Air</span>
+                </div>
+                <p class="mb-0 small">Mapeamento colaborativo de árvores urbanas para uma cidade mais verde e sustentável.</p>
+            </div>
+            <div class="col-6 col-md-2">
+                <h6 class="fw-bold mb-2" style="color:var(--ga-primary)">Navegação</h6>
+                <a href="<?= BASE_URL ?>" class="d-block small mb-1 text-muted">Início</a>
+                <a href="<?= BASE_URL ?>mapa" class="d-block small mb-1 text-muted">Mapa</a>
+                <a href="<?= BASE_URL ?>ranking" class="d-block small mb-1 text-muted">Ranking</a>
+            </div>
+            <div class="col-6 col-md-2">
+                <h6 class="fw-bold mb-2" style="color:var(--ga-primary)">Conta</h6>
+                <?php if ($currentUser ?? null): ?>
+                    <a href="<?= BASE_URL ?>painel" class="d-block small mb-1 text-muted">Painel</a>
+                    <a href="<?= BASE_URL ?>perfil" class="d-block small mb-1 text-muted">Perfil</a>
+                    <a href="<?= BASE_URL ?>minhas-arvores" class="d-block small mb-1 text-muted">Minhas Árvores</a>
+                <?php else: ?>
+                    <a href="<?= BASE_URL ?>login" class="d-block small mb-1 text-muted">Entrar</a>
+                    <a href="<?= BASE_URL ?>registro" class="d-block small mb-1 text-muted">Cadastre-se</a>
+                <?php endif; ?>
             </div>
             <div class="col-md-4">
-                <strong>Links</strong>
-                <div class="mt-1">
-                    <a href="<?= BASE_URL ?>" class="d-block">Início</a>
-                    <a href="<?= BASE_URL ?>mapa" class="d-block">Mapa</a>
-                    <a href="<?= BASE_URL ?>ranking" class="d-block">Ranking</a>
+                <h6 class="fw-bold mb-2" style="color:var(--ga-primary)">Sobre o Projeto</h6>
+                <p class="small mb-2 text-muted">Contribua para o mapeamento das árvores da sua região. Cada registro conta para um futuro mais sustentável!</p>
+                <div class="d-flex gap-2 justify-content-center justify-content-md-start">
+                    <span class="badge bg-success-subtle text-success"><i class="bi bi-tree me-1"></i>Open Source</span>
+                    <span class="badge bg-success-subtle text-success"><i class="bi bi-shield-check me-1"></i>Seguro</span>
                 </div>
             </div>
-            <div class="col-md-4">
-                <strong>Sobre</strong>
-                <p class="mb-0 mt-1">Contribua para o mapeamento das árvores da sua região. Cada registro conta!</p>
+        </div>
+        <hr style="border-color: var(--ga-border); margin: 0 0 1rem 0;">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+            <p class="mb-0 small text-muted">&copy; <?= date('Y') ?> Green Air. Feito com 💚 para o meio ambiente.</p>
+            <div class="d-flex gap-3 small">
+                <a href="#" class="text-muted">Termos</a>
+                <a href="#" class="text-muted">Privacidade</a>
             </div>
         </div>
-        <hr class="my-3" style="border-color: var(--ga-border);">
-        <p class="mb-0">&copy; <?= date('Y') ?> Green Air. Feito com 💚 para o meio ambiente.</p>
     </div>
 </footer>
 

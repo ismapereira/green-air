@@ -18,24 +18,72 @@ $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
     <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/style.css">
     <style>
         body { font-family: var(--ga-font); }
-        .admin-sidebar { width: 240px; min-height: 100vh; background: #0B1120; border-right: 1px solid rgba(255,255,255,0.06); position: fixed; left: 0; top: 0; padding: 1rem 0; z-index: 1050; transition: transform 0.3s; }
-        .admin-sidebar .brand { padding: 0.5rem 1.25rem 1.5rem; font-weight: 800; font-size: 1.1rem; color: #10B981; }
-        .admin-sidebar .nav-link { color: #94A3B8; padding: 0.6rem 1.25rem; font-size: 0.88rem; display: flex; align-items: center; gap: 0.6rem; border-radius: 0; transition: all 0.2s; }
+        .admin-sidebar {
+            width: 250px; min-height: 100vh; background: #0B1120;
+            border-right: 1px solid rgba(255,255,255,0.06);
+            position: fixed; left: 0; top: 0;
+            padding: 1rem 0; z-index: 1060;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+        .admin-sidebar .brand {
+            padding: 0.5rem 1.25rem 1.25rem;
+            font-weight: 800; font-size: 1.1rem; color: #10B981;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .admin-sidebar .nav-link {
+            color: #94A3B8; padding: 0.65rem 1.25rem; font-size: 0.88rem;
+            display: flex; align-items: center; gap: 0.65rem;
+            border-radius: 0; transition: all 0.2s; text-decoration: none;
+        }
         .admin-sidebar .nav-link:hover { color: #fff; background: rgba(255,255,255,0.04); }
         .admin-sidebar .nav-link.active { color: #10B981; background: rgba(16,185,129,0.08); border-right: 3px solid #10B981; }
-        .admin-sidebar .nav-link i { font-size: 1.1rem; width: 20px; text-align: center; }
-        .admin-content { margin-left: 240px; padding: 1.5rem; min-height: 100vh; }
-        @media (max-width: 768px) {
+        .admin-sidebar .nav-link i { font-size: 1.1rem; width: 22px; text-align: center; flex-shrink: 0; }
+        .admin-content { margin-left: 250px; padding: 1.5rem; min-height: 100vh; }
+
+        /* Mobile sidebar */
+        @media (max-width: 991px) {
             .admin-sidebar { transform: translateX(-100%); }
             .admin-sidebar.show { transform: translateX(0); }
             .admin-content { margin-left: 0; }
         }
-        .admin-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+
+        .admin-backdrop {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5); z-index: 1055;
+        }
+        .admin-backdrop.show { display: block; }
+
+        .admin-topbar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1.5rem; gap: 0.5rem;
+        }
+        .admin-topbar .menu-btn {
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+            color: #94A3B8; padding: 0.4rem 0.6rem; border-radius: 8px;
+            cursor: pointer; font-size: 1.2rem; transition: all 0.2s;
+        }
+        .admin-topbar .menu-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+        .admin-sidebar .sidebar-close {
+            display: none; position: absolute; top: 0.75rem; right: 0.75rem;
+            background: none; border: none; color: #94A3B8; font-size: 1.2rem;
+            cursor: pointer; padding: 0.25rem;
+        }
+        .admin-sidebar .sidebar-close:hover { color: #fff; }
+        @media (max-width: 991px) {
+            .admin-sidebar .sidebar-close { display: block; }
+        }
     </style>
 </head>
 <body>
+
+<!-- Backdrop for mobile -->
+<div class="admin-backdrop" id="admin-backdrop"></div>
+
 <!-- Sidebar -->
 <nav class="admin-sidebar" id="admin-sidebar">
+    <button class="sidebar-close" id="sidebar-close"><i class="bi bi-x-lg"></i></button>
     <div class="brand">🌳 Green Air Admin</div>
     <a href="<?= BASE_URL ?>admin" class="nav-link <?= strpos($currentPath, '/admin') !== false && strpos($currentPath, '/admin/') === false ? 'active' : '' ?>"><i class="bi bi-grid"></i>Dashboard</a>
     <a href="<?= BASE_URL ?>admin/usuarios" class="nav-link <?= strpos($currentPath, 'usuarios') !== false ? 'active' : '' ?>"><i class="bi bi-people"></i>Usuários</a>
@@ -52,12 +100,13 @@ $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
 <div class="admin-content">
     <!-- Top bar -->
     <div class="admin-topbar">
-        <button class="btn btn-sm btn-outline-secondary d-md-none" onclick="document.getElementById('admin-sidebar').classList.toggle('show')">
+        <button class="menu-btn d-lg-none" id="admin-menu-btn" title="Menu">
             <i class="bi bi-list"></i>
         </button>
-        <div></div>
+        <div class="d-none d-lg-block"></div>
         <div class="d-flex align-items-center gap-2 small text-muted">
-            <i class="bi bi-person-circle"></i><?= htmlspecialchars($adminUser['name'] ?? 'Admin') ?>
+            <i class="bi bi-person-circle"></i>
+            <span class="d-none d-sm-inline"><?= htmlspecialchars($adminUser['name'] ?? 'Admin') ?></span>
         </div>
     </div>
 
@@ -69,3 +118,17 @@ $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
         <div class="alert alert-danger py-2 small"><i class="bi bi-exclamation-circle me-2"></i><?= htmlspecialchars($_SESSION['admin_error']) ?></div>
         <?php unset($_SESSION['admin_error']); ?>
     <?php endif; ?>
+
+<script>
+(function() {
+    var sidebar = document.getElementById('admin-sidebar');
+    var backdrop = document.getElementById('admin-backdrop');
+    var menuBtn = document.getElementById('admin-menu-btn');
+    var closeBtn = document.getElementById('sidebar-close');
+    function openSidebar() { sidebar.classList.add('show'); backdrop.classList.add('show'); }
+    function closeSidebar() { sidebar.classList.remove('show'); backdrop.classList.remove('show'); }
+    if (menuBtn) menuBtn.addEventListener('click', openSidebar);
+    if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+    if (backdrop) backdrop.addEventListener('click', closeSidebar);
+})();
+</script>
