@@ -1,6 +1,6 @@
 # Segurança
 
-Este documento resume as práticas de segurança **implementadas** no Green Air v2.0 e recomendações para produção.
+Este documento resume as práticas de segurança **implementadas** no Green Air v2.1 e recomendações para produção.
 
 ## O que está implementado
 
@@ -41,6 +41,24 @@ Configurações aplicadas em `config/app.php`:
 
 - Senhas armazenadas com `password_hash(PASSWORD_DEFAULT)` e verificadas com `password_verify()`.
 - Recuperação de senha usa tokens aleatórios (`random_bytes(32)`) com validade de 24 horas.
+- O link de redefinição é enviado **exclusivamente por e-mail** via SMTP — nunca exposto na interface.
+- Mensagem genérica após solicitação ("Se o e-mail estiver cadastrado...") — não revela se o e-mail existe.
+
+### Envio de e-mails (SmtpMailer)
+
+- Classe SMTP nativa (`app/helpers/SmtpMailer.php`) sem dependências externas.
+- Suporte a TLS (STARTTLS na porta 587) e SSL (porta 465).
+- Autenticação via AUTH LOGIN com credenciais do `.env`.
+- E-mails em formato multipart (HTML + texto plano).
+- Erros de envio são registrados em `storage/logs/mail_errors.log`.
+- Método `isConfigured()` valida que host, username, password e fromEmail estão preenchidos antes de tentar enviar.
+
+### Externalização de credenciais
+
+- **Todas** as configurações sensíveis (banco, API keys, SMTP) vivem no `.env` — nunca hardcoded no código.
+- O `.env` está no `.gitignore` e não é versionado.
+- E-mail de contato na página de Privacidade lê de `env('MAIL_FROM_ADDRESS')` ao invés de string fixa.
+- O `.htaccess` público bloqueia acesso direto a `.env`, `config/`, `app/`, `routes/`, `storage/`.
 
 ### SQL injection
 
@@ -111,3 +129,5 @@ Como `uploads/` fica fora de `public/`, as imagens são servidas por um handler 
 - Não armazena a localização "do usuário" (a não ser temporariamente no browser para centralizar mapa/clima).
 - Fotos de perfil são opcionais.
 - Modal de Termos de Uso exibido no cadastro com aceite obrigatório.
+- Página de **Termos de Uso** (`/termos`) e **Política de Privacidade** (`/privacidade`) disponíveis publicamente.
+- E-mail de contato para questões de privacidade configurado via `.env`.

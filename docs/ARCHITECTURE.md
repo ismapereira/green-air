@@ -4,7 +4,7 @@ O Green Air usa **PHP puro** com um **MVC simples**, front controller e um desig
 
 ## Visão geral do fluxo
 
-1. O Apache reescreve as rotas (mod_rewrite) para `public/index.php`
+1. O Apache reescreve as rotas (mod_rewrite) via `.htaccess` raiz para `public/index.php`
 2. `public/index.php` carrega:
    - `config/env.php` (variáveis do `.env`)
    - `config/database.php` (PDO)
@@ -18,7 +18,9 @@ O Green Air usa **PHP puro** com um **MVC simples**, front controller e um desig
 ## Estrutura de diretórios
 
 ```text
+.htaccess               Redirecionamento raiz → public/
 public/                 Front controller + assets + .htaccess
+  favicon.svg           Favicon SVG (ícone de árvore)
   assets/
     css/style.css       Design system (CSS variables, Bootstrap overrides)
     js/main.js          Dark mode, toasts, photo preview, form protection
@@ -28,11 +30,12 @@ public/                 Front controller + assets + .htaccess
 app/
   controllers/          Controllers (fluxo + CSRF + auth)
   models/               Models (acesso ao banco via PDO)
-  helpers/              UploadHelper, CacheHelper
+  helpers/              UploadHelper, CacheHelper, SmtpMailer
   views/
-    layout/             header.php (navbar), footer.php (bottom nav + footer)
+    layout/             header.php (navbar + favicon), footer.php (bottom nav + footer)
     auth/               Login, registro, forgot, reset
     dashboard/          Painel do usuário
+    home/               Homepage, termos de uso, política de privacidade
     tree/               Create, edit, my-trees, show
     map/                Mapa interativo
     user/               Perfil
@@ -44,6 +47,7 @@ routes/                 web.php (tabela de rotas)
 uploads/                Armazenamento local de imagens
 storage/
   cache/                Cache file-based para API
+  logs/                 Logs de erros de e-mail SMTP
 database/
   migration_v2.sql      Script de migração v2.0
 ```
@@ -113,6 +117,7 @@ O schema do banco é criado por `database.sql` + `database/migration_v2.sql`. De
 |--------|-----------------|
 | `UploadHelper` | Upload centralizado: validação MIME/tamanho, nomes aleatórios, limpeza de arquivos antigos |
 | `CacheHelper` | Cache file-based em `storage/cache/` com TTL configurável |
+| `SmtpMailer` | Envio de e-mails via SMTP (TLS/SSL, AUTH LOGIN) sem dependências externas. Credenciais via `.env` |
 
 ## Uploads
 
@@ -153,3 +158,4 @@ Isso evita expor todo o diretório `uploads/` diretamente.
   - Air Pollution (AQI + poluentes individuais)
   - Forecast 5 days/3h (previsão horária e diária)
 - **OpenStreetMap/Nominatim**: reverse geocoding no frontend (best-effort) ao cadastrar árvore
+- **Gmail SMTP**: envio de e-mails transacionais (recuperação de senha) via `SmtpMailer`

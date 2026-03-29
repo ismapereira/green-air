@@ -36,6 +36,24 @@ O widget de clima tenta usar **geolocalização do navegador** e envia `lat/lon`
 
 > **APIs utilizadas**: Weather (current), Air Pollution (AQI + poluentes), Forecast 5 days/3h. Todas requerem a mesma API key.
 
+### E-mail (SMTP) — Recuperação de Senha
+
+Usadas pelo `SmtpMailer` (`app/helpers/SmtpMailer.php`):
+
+| Variável | Padrão | Descrição |
+|----------|--------|-----------|
+| `MAIL_HOST` | `smtp.gmail.com` | Servidor SMTP |
+| `MAIL_PORT` | `587` | Porta (587 para TLS, 465 para SSL) |
+| `MAIL_USERNAME` | (vazio) | E-mail de autenticação SMTP |
+| `MAIL_PASSWORD` | (vazio) | Senha ou App Password |
+| `MAIL_FROM_ADDRESS` | (vazio) | E-mail remetente (exibido ao destinatário) |
+| `MAIL_FROM_NAME` | `Green Air` | Nome do remetente |
+| `MAIL_ENCRYPTION` | `tls` | Tipo de criptografia (`tls` ou `ssl`) |
+
+O e-mail de contato na página de Privacidade também lê de `MAIL_FROM_ADDRESS`.
+
+> **Gmail**: ative a [Verificação em 2 etapas](https://myaccount.google.com/security) e gere uma [Senha de App](https://myaccount.google.com/apppasswords). Use a senha de app (16 caracteres, sem espaços) em `MAIL_PASSWORD`.
+
 ## Constantes de `config/app.php`
 
 As seguintes constantes são definidas e podem ser ajustadas:

@@ -5,7 +5,7 @@ Esta documentação descreve os endpoints internos usados pelo frontend do Green
 ## Convenções
 
 - **Base URL**: depende de onde o projeto foi publicado.
-  - Ex.: `http://localhost/Desenvolvimentos/green-air/public/`
+  - Ex.: `http://localhost/Desenvolvimentos/green-air/`
 - Respostas em JSON com `Content-Type: application/json; charset=utf-8`
 - Endpoints que requerem autenticação verificam a sessão PHP ativa.
 - Endpoints POST requerem token CSRF via campo `_csrf` ou header `X-CSRF-TOKEN`.
@@ -169,7 +169,7 @@ Lista notificações do usuário logado (últimas 20). **Requer autenticação**
     "id": 1,
     "user_id": 2,
     "type": "welcome",
-    "title": "Bem-vindo ao Green Air! 🌳",
+    "title": "Bem-vindo ao Green Air!",
     "message": "Comece cadastrando sua primeira árvore e ganhe pontos.",
     "link": "/cadastrar-arvore",
     "is_read": 0,

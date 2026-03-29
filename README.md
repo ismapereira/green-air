@@ -1,4 +1,4 @@
-<h1 align="center"> 🌳 Green Air - Mapeamento Colaborativo de Árvores Urbanas</h1>
+<h1 align="center">🌲 Green Air - Mapeamento Colaborativo de Árvores Urbanas</h1>
 
 <p align="center">
   <img src = "https://img.shields.io/badge/License-MIT-green.svg">
@@ -54,15 +54,18 @@ cp .env.example .env
 Preencha pelo menos:
 - `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`
 - `OPENWEATHER_API_KEY` (para clima/qualidade do ar/poluentes/previsão)
+- `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS` (para recuperação de senha via SMTP)
+
+> **Gmail**: ative a verificação em 2 etapas e gere uma [Senha de App](https://myaccount.google.com/apppasswords) para `MAIL_PASSWORD`.
 
 O arquivo `.env` **não deve ser versionado** (já está no `.gitignore`).
 
 ### 3) DocumentRoot / URL
 
-O ponto de entrada é `public/index.php`.
+O ponto de entrada é `public/index.php`. O `.htaccess` na raiz redireciona automaticamente para `public/`.
 
-- **Recomendado (produção)**: configure o DocumentRoot para a pasta `public`.
-- **Dev no XAMPP**: acesse via `http://localhost/Desenvolvimentos/green-air/public/`.
+- **Dev no XAMPP**: acesse via `http://localhost/Desenvolvimentos/green-air/` (sem `/public/`)
+- **Produção**: configure o DocumentRoot para a pasta `public` ou mantenha o `.htaccess` raiz.
 
 Se rotas como `/login` retornarem 404, veja `docs/TROUBLESHOOTING.md`.
 
@@ -81,8 +84,10 @@ php scripts/seed_admin.php
 ## Estrutura do projeto (MVC)
 
 ```
+.htaccess             # Redirecionamento raiz → public/
 public/               # Front controller, assets e .htaccess
   index.php
+  favicon.svg         # Favicon SVG (ícone de árvore)
   assets/
     css/style.css     # Design system (Bootstrap 5 + custom)
     js/main.js        # Dark mode, toasts, photo preview
@@ -91,11 +96,12 @@ public/               # Front controller, assets e .htaccess
 app/
   controllers/        # Controllers (lógica de fluxo + CSRF)
   models/             # Models (acesso ao banco via PDO)
-  helpers/            # UploadHelper, CacheHelper
+  helpers/            # UploadHelper, CacheHelper, SmtpMailer
   views/
     layout/           # header.php (navbar), footer.php (bottom nav)
     auth/             # Login, registro, forgot, reset
     dashboard/        # Painel do usuário
+    home/             # Homepage, termos de uso, privacidade
     tree/             # CRUD de árvores + detalhes
     map/              # Mapa interativo
     user/             # Perfil
@@ -113,6 +119,7 @@ uploads/
   users/
 storage/
   cache/              # Cache de APIs (file-based)
+  logs/               # Logs de erros de e-mail
 database/
   migration_v2.sql    # Migração v2.0
 docs/                 # Documentação detalhada
@@ -121,7 +128,7 @@ database.sql          # Schema inicial
 
 ## Rotas principais
 
-- **Público**: `/`, `/mapa`, `/arvore/{id}`
+- **Público**: `/`, `/mapa`, `/arvore/{id}`, `/termos`, `/privacidade`
 - **Auth**: `/login`, `/registro`, `/logout`, `/esqueci-senha`, `/redefinir-senha`
 - **Usuário**: `/painel`, `/cadastrar-arvore`, `/minhas-arvores`, `/perfil`, `/ranking`
 - **Admin** (role `admin`): `/admin` e `/admin/*` (usuarios, arvores, especies, status, sugestoes, contribuicoes, configuracoes)
@@ -135,13 +142,15 @@ database.sql          # Schema inicial
 
 Detalhes em `docs/API.md`.
 
-## Segurança (v2.0)
+## Segurança (v2.1)
 
 - **CSRF** em todos os formulários POST (token com `random_bytes(32)` + `hash_equals`)
 - **Rate limiting** no login (5 tentativas / 15 min, por email+IP)
 - **RBAC** com coluna `role` (user/moderator/admin) substituindo nível Ouro para acesso admin
 - **Sessão segura** (httponly, samesite=Lax, strict_mode, regenerate_id no login)
 - **Upload centralizado** via `UploadHelper` (validação MIME, tamanho, nomes aleatórios)
+- **Recuperação de senha segura**: link enviado exclusivamente por e-mail via SMTP (nunca exposto na interface)
+- **Credenciais externalizadas**: todas as configurações sensíveis vivem no `.env` (fora do versionamento)
 - Prepared statements (PDO), `password_hash()`, XSS-safe no mapa (textContent)
 
 Detalhes em `docs/SECURITY.md`.

@@ -8,14 +8,16 @@ Este guia descreve recomendações para publicar o Green Air em produção.
 - MySQL/MariaDB
 - HTTPS (certificado TLS)
 
-## 2) DocumentRoot apontando para `public/`
+## 2) DocumentRoot e URLs
 
-**Recomendado**: configure o DocumentRoot do seu site para a pasta `public/`.
+**Opção A (recomendado)**: configure o DocumentRoot do seu site para a pasta `public/`.
 
-Motivos:
+**Opção B**: mantenha o `.htaccess` raiz que redireciona automaticamente para `public/`. Neste caso, URLs como `https://seusite.com/painel` já funcionam sem necessidade de `/public/` na URL.
+
+Motivos para preferir Opção A:
 
 - Evita expor `config/`, `app/`, `routes/`, `storage/` e outros arquivos do projeto
-- Mantém URLs limpas (sem `/public`)
+- Máxima segurança sem depender de `.htaccess`
 
 ## 3) Banco de dados
 
@@ -37,8 +39,27 @@ O PHP precisa escrever em:
 - `uploads/trees`
 - `uploads/users`
 - `storage/cache`
+- `storage/logs`
 
 Em Linux, ajuste ownership/permissões conforme o usuário do PHP/Apache.
+
+## 6) Configuração de E-mail (SMTP)
+
+Preencha no `.env`:
+
+```ini
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=seu_email@gmail.com
+MAIL_PASSWORD=sua_senha_de_app
+MAIL_FROM_ADDRESS=seu_email@gmail.com
+MAIL_FROM_NAME=Green Air
+MAIL_ENCRYPTION=tls
+```
+
+Para Gmail, é necessário gerar uma [Senha de App](https://myaccount.google.com/apppasswords) (requer verificação em 2 etapas ativa).
+
+Erros de envio são registrados em `storage/logs/mail_errors.log`.
 
 ## 6) Ajustes recomendados de PHP
 
@@ -87,16 +108,19 @@ O diretório `storage/cache/` é usado para caching de respostas de API. Garanta
 - Permissão de escrita
 - Limpeza periódica (opcional, pois o `CacheHelper` respeita TTL)
 
-## 11) Checklist final
+## Checklist final
 
 - [ ] `.env` preenchido e protegido
 - [ ] `database.sql` importado
 - [ ] `migration_v2.sql` aplicada
-- [ ] DocumentRoot → `public/`
+- [ ] DocumentRoot → `public/` (ou `.htaccess` raiz ativo)
 - [ ] `mod_rewrite`/rewrite funcionando (rotas não dão 404)
 - [ ] `uploads/` com permissão de escrita
 - [ ] `storage/cache/` com permissão de escrita
+- [ ] `storage/logs/` com permissão de escrita
 - [ ] HTTPS ativo
 - [ ] `display_errors=Off` no `php.ini`
 - [ ] OpenWeather API key válida (`OPENWEATHER_API_KEY`)
+- [ ] Configuração SMTP preenchida (MAIL_HOST, MAIL_USERNAME, MAIL_PASSWORD, MAIL_FROM_ADDRESS)
+- [ ] Testar recuperação de senha (e-mail deve chegar)
 - [ ] Backup do banco configurado

@@ -5,6 +5,44 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [2.1.0] - 2026-03-29 — Polimento, Segurança de E-mail e Páginas Legais
+
+### Adicionado
+
+#### Páginas e Rotas
+- **Termos de Uso** (`/termos`): página completa com 9 seções cobrindo aceitação, cadastro, conteúdo, GPS, gamificação, moderação e responsabilidade.
+- **Política de Privacidade** (`/privacidade`): página completa com tabela de dados coletados, seções sobre geolocalização, segurança, cookies, direitos do usuário e contato.
+- **Favicon SVG**: ícone de árvore em SVG (mesmo do navbar) como favicon em todas as páginas.
+
+#### E-mail e Recuperação de Senha
+- **`SmtpMailer`** (`app/helpers/SmtpMailer.php`): classe SMTP nativa (sem dependências externas) com suporte a TLS/SSL, AUTH LOGIN, multipart (HTML + texto), logging de erros.
+- **Recuperação de senha segura**: link de redefinição enviado exclusivamente por e-mail via SMTP. O link nunca é exposto na interface da aplicação.
+- **Template HTML de e-mail**: e-mail de redefinição com design branded (gradiente verde, botão CTA, link fallback).
+- **Variáveis SMTP no `.env`**: `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME`, `MAIL_ENCRYPTION`.
+
+#### Infraestrutura
+- **`.htaccess` raiz**: redirecionamento automático de `/green-air/` para `/green-air/public/` — URLs limpas sem `/public/` visível.
+- **`storage/logs/`**: diretório para logs de erros de e-mail SMTP.
+
+### Alterado
+
+#### UI/UX
+- **Emojis → Bootstrap Icons**: substituição completa de todos os emojis (🌳🌱🔑🔐💚👋🌍🌿) por ícones SVG/Bootstrap Icons em todas as páginas, controllers e JavaScript (navbar, footer, login, registro, forgot, reset, dashboard, homepage, mapa, admin).
+- **Cards de clima harmonizados**: todos os 4 cards principais (temperatura, umidade, vento, qualidade do ar) agora têm altura igual (`h-100`) com informações extras (pressão, visibilidade) nos cards menores.
+- **Botões do hero (mobile)**: espaçamento adequado com `d-flex flex-wrap gap-3` ao invés de `me-2`.
+- **Brand icon**: ícone `bi-tree-fill` com cor `var(--ga-primary)` no navbar, substituindo emoji.
+- **Marcador do mapa**: emoji de árvore substituído por SVG inline no `L.divIcon` do Leaflet.
+
+#### Segurança
+- **Remoção da exposição de link de reset**: removido o modo de desenvolvimento que exibia o link de redefinição diretamente na página (vulnerabilidade de segurança).
+- **Credenciais externalizadas**: e-mail de contato na página de privacidade agora lê de `env('MAIL_FROM_ADDRESS')` — zero credenciais hardcoded no código-fonte.
+- **`BASE_URL` sem `/public`**: `config/app.php` agora remove automaticamente `/public` do `BASE_PATH` para URLs limpas.
+
+#### Links do footer
+- Links de "Termos" e "Privacidade" agora apontam para `/termos` e `/privacidade` (antes eram `#`).
+
+---
+
 ## [2.0.0] - 2026-03-28 — Redesign Completo + Segurança
 
 ### Adicionado
@@ -84,8 +122,10 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ---
 
 ## [Não Lançado]
-### Adicionado
-- Modal de **Termos de Uso e Política de Privacidade** na página de cadastro.
+### Planejado
+- CAPTCHA em formulários de cadastro e recuperação de senha.
+- Content Security Policy (CSP) headers.
+- Exportação de dados do usuário (portabilidade LGPD).
 
 ## [1.0.0] - Nova Estrutura MVC - Marco Zero
 ### Adicionado
