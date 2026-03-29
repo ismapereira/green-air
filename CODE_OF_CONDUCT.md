@@ -32,7 +32,7 @@ Os mantenedores do projeto são responsáveis por esclarecer e aplicar nossos pa
 
 Se você vivenciar ou testemunhar comportamento inaceitável, reporte para os mantenedores:
 
-- **Contato**: `ismaelpereirafeitosa@hotmail.com`
+- **Contato**: `suportegreenair@gmail.com`
 
 Os reportes serão analisados e tratados com discrição, dentro do possível.
 
