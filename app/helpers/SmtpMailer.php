@@ -20,7 +20,7 @@ class SmtpMailer
         $this->port       = (int) env('MAIL_PORT', '587');
         $this->username   = env('MAIL_USERNAME', '');
         $this->password   = env('MAIL_PASSWORD', '');
-        $this->fromEmail  = env('MAIL_FROM_ADDRESS', 'noreply@greenair.com');
+        $this->fromEmail  = env('MAIL_FROM_ADDRESS', '');
         $this->fromName   = env('MAIL_FROM_NAME', 'Green Air');
         $this->encryption = env('MAIL_ENCRYPTION', 'tls');
         $this->timeout    = 30;
@@ -31,7 +31,7 @@ class SmtpMailer
      */
     public function isConfigured(): bool
     {
-        return !empty($this->host) && !empty($this->username) && !empty($this->password);
+        return !empty($this->host) && !empty($this->username) && !empty($this->password) && !empty($this->fromEmail);
     }
 
     /**

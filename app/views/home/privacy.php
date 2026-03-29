@@ -82,7 +82,7 @@ require ROOT_PATH . '/app/views/layout/header.php';
         <p>Esta política pode ser atualizada periodicamente. Notificaremos os usuários por meio de notificações internas na plataforma sobre mudanças significativas.</p>
 
         <h5 class="fw-bold mt-4"><i class="bi bi-envelope text-success me-2"></i>Contato</h5>
-        <p>Para dúvidas sobre privacidade, entre em contato pelo e-mail: <strong>ismaelpereirafeitosa@hotmail.com</strong></p>
+        <p>Para dúvidas sobre privacidade, entre em contato pelo e-mail: <strong><?= htmlspecialchars(env('MAIL_FROM_ADDRESS', '')) ?></strong></p>
 
         <hr class="my-4" style="border-color: var(--ga-border)">
         <div class="text-center">
