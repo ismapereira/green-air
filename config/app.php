@@ -4,11 +4,13 @@
  * Green Air v2.0 - Mapeamento de Árvores Urbanas
  */
 
-// Base URL
+// Base URL — remover /public do path para URLs limpas
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $script = dirname($_SERVER['SCRIPT_NAME'] ?? '');
 $basePath = $script ?: '';
+// Remover /public do final, pois o .htaccess raiz já redireciona internamente
+$basePath = preg_replace('#/public$#', '', $basePath);
 define('BASE_URL', $protocol . '://' . $host . $basePath . '/');
 define('BASE_PATH', $basePath);
 

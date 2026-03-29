@@ -1,6 +1,10 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    # Sem RewriteBase fixo - funciona em qualquer caminho (ex: /Desenvolvimentos/green-air/public/)
+
+    # Impedir acesso direto a pastas protegidas
+    RewriteRule ^(\.env|config|app|routes|storage|database|scripts) - [F,L]
+
+    # Se o arquivo ou diretório existe, servir diretamente (CSS, JS, imagens)
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)$ index.php [QSA,L]
