@@ -15,12 +15,12 @@ require ROOT_PATH . '/app/views/layout/header.php';
         <p class="lead" data-aos="fade-up" data-aos-delay="100">
             Contribua para um futuro mais verde. Cadastre árvores urbanas, acompanhe a qualidade do ar e faça parte da mudança.
         </p>
-        <div data-aos="fade-up" data-aos-delay="200">
+        <div class="d-flex flex-wrap gap-3 justify-content-center" data-aos="fade-up" data-aos-delay="200">
             <?php if ($currentUser): ?>
-                <a href="<?= BASE_URL ?>cadastrar-arvore" class="btn btn-light btn-lg me-2"><i class="bi bi-plus-circle me-2"></i>Cadastrar Árvore</a>
+                <a href="<?= BASE_URL ?>cadastrar-arvore" class="btn btn-light btn-lg"><i class="bi bi-plus-circle me-2"></i>Cadastrar Árvore</a>
                 <a href="<?= BASE_URL ?>mapa" class="btn btn-outline-light btn-lg"><i class="bi bi-map me-2"></i>Ver Mapa</a>
             <?php else: ?>
-                <a href="<?= BASE_URL ?>registro" class="btn btn-light btn-lg me-2"><i class="bi bi-person-plus me-2"></i>Comece Agora</a>
+                <a href="<?= BASE_URL ?>registro" class="btn btn-light btn-lg"><i class="bi bi-person-plus me-2"></i>Comece Agora</a>
                 <a href="<?= BASE_URL ?>mapa" class="btn btn-outline-light btn-lg"><i class="bi bi-map me-2"></i>Explorar Mapa</a>
             <?php endif; ?>
         </div>

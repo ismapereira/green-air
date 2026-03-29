@@ -153,35 +153,36 @@ class AuthController extends Controller
             $this->redirect('/esqueci-senha');
             return;
         }
+
         $user = $this->userModel->findByEmail($email);
         if ($user) {
             $token = bin2hex(random_bytes(32));
             $this->resetModel->create($email, $token);
             $link = BASE_URL . 'redefinir-senha?token=' . $token;
 
-            // Attempt to send email
             $emailSent = $this->sendResetEmail($email, $user['name'] ?? '', $link);
 
-            // In development: if mail fails, show the link directly
-            if (!$emailSent && env('APP_ENV', 'development') === 'development') {
+            if (!$emailSent) {
                 $_SESSION['forgot_message'] = [
-                    'type' => 'info',
-                    'text' => 'Ambiente de desenvolvimento detectado. Use o link: ' . $link
+                    'type' => 'error',
+                    'text' => 'Não foi possível enviar o e-mail. Verifique se as configurações de SMTP estão corretas no arquivo .env.'
                 ];
-                $_SESSION['reset_link'] = $link;
                 $this->redirect('/esqueci-senha');
                 return;
             }
         }
-        $_SESSION['forgot_message'] = ['type' => 'success', 'text' => 'Se o e-mail existir, você receberá o link para redefinir a senha.'];
+
+        // Mensagem genérica por segurança (não revela se o e-mail existe)
+        $_SESSION['forgot_message'] = ['type' => 'success', 'text' => 'Se o e-mail estiver cadastrado, você receberá um link para redefinir sua senha em instantes.'];
         $this->redirect('/esqueci-senha');
     }
 
     /**
-     * Send password reset email using PHPMailer or native mail()
+     * Send password reset email via SMTP
      */
     private function sendResetEmail(string $to, string $name, string $link): bool
     {
+        $mailer = new SmtpMailer();
         $subject = 'Green Air - Redefinir senha';
         $firstName = explode(' ', $name)[0] ?: 'Usuário';
 
@@ -198,9 +199,9 @@ class AuthController extends Controller
         $htmlBody .= '<p style="text-align:center;margin:1.5rem 0">';
         $htmlBody .= '<a href="' . htmlspecialchars($link) . '" style="display:inline-block;background:#059669;color:#fff;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:bold">Redefinir Minha Senha</a>';
         $htmlBody .= '</p>';
-        $htmlBody .= '<p style="color:#64748b;font-size:0.9rem">Este link é válido por <strong>24 horas</strong>. Se você não solicitou a redefinição, pode ignorar este e-mail.</p>';
+        $htmlBody .= '<p style="color:#64748b;font-size:0.9rem">Este link é válido por <strong>24 horas</strong>. Se você não solicitou a redefinição, ignore este e-mail com segurança.</p>';
         $htmlBody .= '<hr style="border:none;border-top:1px solid #e5e7eb;margin:1.5rem 0">';
-        $htmlBody .= '<p style="color:#94a3b8;font-size:0.8rem">Se o botão não funcionar, copie e cole este link no seu navegador:<br><a href="' . htmlspecialchars($link) . '" style="color:#059669;word-break:break-all">' . htmlspecialchars($link) . '</a></p>';
+        $htmlBody .= '<p style="color:#94a3b8;font-size:0.8rem">Se o botão não funcionar, copie e cole este link no navegador:<br><a href="' . htmlspecialchars($link) . '" style="color:#059669;word-break:break-all">' . htmlspecialchars($link) . '</a></p>';
         $htmlBody .= '</div></div></body></html>';
 
         // Plain text fallback
@@ -208,37 +209,9 @@ class AuthController extends Controller
         $textBody .= "Recebemos uma solicitação para redefinir a senha da sua conta no Green Air.\n\n";
         $textBody .= "Acesse o link abaixo para redefinir sua senha:\n{$link}\n\n";
         $textBody .= "Este link é válido por 24 horas.\n";
-        $textBody .= "Se você não solicitou a redefinição, pode ignorar este e-mail.\n";
+        $textBody .= "Se você não solicitou a redefinição, ignore este e-mail.\n";
 
-        // Try sending with mail()
-        $headers = "MIME-Version: 1.0\r\n";
-        $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-        $headers .= "From: Green Air <noreply@greenair.com>\r\n";
-        $headers .= "Reply-To: noreply@greenair.com\r\n";
-        $headers .= "X-Mailer: GreenAir/2.0\r\n";
-
-        $sent = @mail($to, $subject, $htmlBody, $headers);
-
-        // If mail() failed, try saving to file as fallback (development)
-        if (!$sent) {
-            $this->saveEmailToFile($to, $subject, $textBody);
-        }
-
-        return $sent;
-    }
-
-    /**
-     * Save email to file for development environments where mail() is unavailable
-     */
-    private function saveEmailToFile(string $to, string $subject, string $body): void
-    {
-        $dir = ROOT_PATH . '/storage/emails';
-        if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
-        }
-        $filename = $dir . '/' . date('Y-m-d_H-i-s') . '_' . preg_replace('/[^a-z0-9]/', '_', $to) . '.txt';
-        $content = "To: {$to}\nSubject: {$subject}\nDate: " . date('Y-m-d H:i:s') . "\n\n{$body}";
-        file_put_contents($filename, $content);
+        return $mailer->send($to, $subject, $htmlBody, $textBody);
     }
 
     public function resetForm(): void

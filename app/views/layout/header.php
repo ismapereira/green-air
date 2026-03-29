@@ -18,6 +18,7 @@ $route = '/' . ltrim($route, '/');
     <meta name="description" content="Green Air — Mapeamento colaborativo de árvores urbanas. Cadastre, localize e contribua para uma cidade mais verde.">
     <meta name="theme-color" content="#059669">
     <title><?= htmlspecialchars($pageTitle) ?> | Green Air</title>
+    <link rel="icon" type="image/svg+xml" href="<?= BASE_URL ?>favicon.svg">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

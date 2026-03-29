@@ -8,6 +8,7 @@ $message = $message ?? null;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recuperar Senha | Green Air</title>
+    <link rel="icon" type="image/svg+xml" href="<?= BASE_URL ?>favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -65,21 +66,9 @@ $message = $message ?? null;
 
     <div class="auth-card">
         <?php if ($message): ?>
-            <?php
-                $alertType = 'danger';
-                if ($message['type'] === 'success') $alertType = 'success';
-                if ($message['type'] === 'info') $alertType = 'info';
-            ?>
-            <div class="alert alert-<?= $alertType ?> py-2 mb-3">
-                <?php if ($message['type'] === 'info' && !empty($_SESSION['reset_link'])): ?>
-                    <div class="mb-2"><i class="bi bi-info-circle me-1"></i> Ambiente de desenvolvimento — e-mail não enviado.</div>
-                    <a href="<?= htmlspecialchars($_SESSION['reset_link']) ?>" class="btn btn-sm btn-success w-100">
-                        <i class="bi bi-arrow-right-circle me-1"></i> Redefinir Senha Agora
-                    </a>
-                    <?php unset($_SESSION['reset_link']); ?>
-                <?php else: ?>
-                    <?= htmlspecialchars($message['text']) ?>
-                <?php endif; ?>
+            <div class="alert alert-<?= $message['type'] === 'success' ? 'success' : 'danger' ?> py-2 mb-3">
+                <i class="bi bi-<?= $message['type'] === 'success' ? 'check-circle' : 'exclamation-triangle' ?> me-1"></i>
+                <?= htmlspecialchars($message['text']) ?>
             </div>
         <?php endif; ?>
 
