@@ -84,14 +84,14 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(function() { div.classList.add('opacity-0'); setTimeout(function() { div.remove(); }, 300); }, 4000);
     };
 
-    // ---- Notification Dropdown (Desktop) ----
-    var notifBtn = document.getElementById('desktop-notif-btn');
-    if (notifBtn) {
-        notifBtn.addEventListener('click', function(e) {
+    // ---- Notification Dropdown (Desktop + Mobile) ----
+    var notifBtns = document.querySelectorAll('#desktop-notif-btn, #mobile-notif-btn');
+    notifBtns.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
             e.preventDefault();
             loadNotifications();
         });
-    }
+    });
 
     function loadNotifications() {
         fetch(window.BASE_URL + 'api/notificacoes', { headers: { 'X-CSRF-TOKEN': window.CSRF_TOKEN || '' } })

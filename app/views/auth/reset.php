@@ -18,7 +18,7 @@ $token = $token ?? '';
         * { box-sizing: border-box; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            margin: 0; min-height: 100dvh; display: flex; align-items: center; justify-content: center;
             background: linear-gradient(135deg, #059669 0%, #047857 30%, #064E3B 100%);
             padding: 1rem; -webkit-font-smoothing: antialiased;
         }

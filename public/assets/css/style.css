@@ -70,7 +70,9 @@ body {
     line-height: 1.6;
     margin: 0;
     -webkit-font-smoothing: antialiased;
-    padding-bottom: var(--ga-bottom-nav-h);
+    padding-bottom: calc(var(--ga-bottom-nav-h) + env(safe-area-inset-bottom, 0px));
+    /* dvh garante que o viewport dinâmico mobile é respeitado */
+    min-height: 100dvh;
 }
 @media (min-width: 768px) {
     body { padding-bottom: 0; }
@@ -147,17 +149,21 @@ a:hover { color: var(--ga-primary-dark); }
     bottom: 0;
     left: 0;
     right: 0;
-    height: var(--ga-bottom-nav-h);
+    height: calc(var(--ga-bottom-nav-h) + env(safe-area-inset-bottom, 0px));
     background: var(--ga-bg-glass);
     backdrop-filter: var(--ga-glass-blur);
     -webkit-backdrop-filter: var(--ga-glass-blur);
     border-top: var(--ga-glass-border);
     display: flex;
     justify-content: space-around;
-    align-items: center;
+    align-items: flex-start;
+    padding-top: 6px;
     z-index: 1050;
     box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
-    padding-bottom: env(safe-area-inset-bottom, 0);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    /* Fix para browsers mobile com address bar dinâmica */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
 }
 .ga-bottom-nav .bnav-item {
     display: flex;
@@ -429,9 +435,9 @@ a:hover { color: var(--ga-primary-dark); }
 .forecast-item .fc-icon { font-size: 1.3rem; margin: 4px 0; }
 
 /* ---- Map Page ---- */
-.ga-map-page { display: flex; flex-direction: column; height: calc(100vh - var(--ga-header-h) - var(--ga-bottom-nav-h)); }
+.ga-map-page { display: flex; flex-direction: column; height: calc(100dvh - var(--ga-header-h) - var(--ga-bottom-nav-h)); }
 @media (min-width: 768px) {
-    .ga-map-page { height: calc(100vh - var(--ga-header-h)); }
+    .ga-map-page { height: calc(100dvh - var(--ga-header-h)); }
 }
 .ga-map-filters {
     padding: 0.75rem;

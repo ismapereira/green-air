@@ -21,7 +21,7 @@ unset($_SESSION['login_error'], $_SESSION['register_success']);
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             margin: 0;
-            min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             align-items: center;
             justify-content: center;

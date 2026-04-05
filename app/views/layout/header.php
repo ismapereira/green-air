@@ -47,12 +47,12 @@ $route = '/' . ltrim($route, '/');
         <!-- Mobile: actions always visible -->
         <div class="d-flex align-items-center gap-2 d-lg-none">
             <?php if ($currentUser): ?>
-            <a href="<?= BASE_URL ?>api/notificacoes" class="nav-link position-relative p-1" id="mobile-notif-btn" title="Notificações">
+            <button type="button" class="nav-link position-relative p-1 border-0 bg-transparent" id="mobile-notif-btn" title="Notificações">
                 <i class="bi bi-bell fs-5"></i>
                 <?php if ($unreadNotifications > 0): ?>
                     <span class="notification-badge"><?= $unreadNotifications ?></span>
                 <?php endif; ?>
-            </a>
+            </button>
             <?php endif; ?>
             <button class="theme-toggle" id="theme-toggle-mobile" title="Alternar tema">
                 <i class="bi bi-moon-fill"></i>
