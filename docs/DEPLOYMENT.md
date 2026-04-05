@@ -23,6 +23,7 @@ Motivos para preferir Opção A:
 
 - Importe `database.sql` na primeira instalação
 - Aplique `database/migration_v2.sql` para as tabelas v2.0
+- Aplique `database/migration_v2.1.sql` para a espécie "Não identificada"
 - Faça backups regulares do banco e da pasta `uploads/`
 
 ## 4) Variáveis de ambiente
@@ -113,6 +114,7 @@ O diretório `storage/cache/` é usado para caching de respostas de API. Garanta
 - [ ] `.env` preenchido e protegido
 - [ ] `database.sql` importado
 - [ ] `migration_v2.sql` aplicada
+- [ ] `migration_v2.1.sql` aplicada
 - [ ] DocumentRoot → `public/` (ou `.htaccess` raiz ativo)
 - [ ] `mod_rewrite`/rewrite funcionando (rotas não dão 404)
 - [ ] `uploads/` com permissão de escrita

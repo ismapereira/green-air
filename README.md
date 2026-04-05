@@ -14,7 +14,7 @@ Aplicação web completa (PHP puro + MySQL + Bootstrap 5) para **mapear árvores
 
 ## Visão geral
 
-- **Cadastro de árvores** com foto, espécie, status de preservação, tamanho, idade, observações e **geolocalização automática**.
+- **Cadastro de árvores** com foto, espécie (ou "Não identificada"), status de preservação, tamanho, idade, observações e **geolocalização automática**.
 - **Mapa interativo (Leaflet + MarkerCluster)** com filtros por espécie, status e tamanho; centralização automática no GPS do usuário.
 - **Dashboard do usuário** com progresso de nível, ranking, **clima completo** (temperatura, umidade, vento, pressão, AQI, poluentes, previsão 5 dias) via OpenWeather.
 - **Gamificação** com pontos, níveis (Bronze/Prata/Ouro), ranking semanal/mensal/geral e pódio visual.
@@ -39,10 +39,11 @@ Importe `database.sql` no MySQL (cria banco, tabelas e seeds):
 mysql -u root -p < database.sql
 ```
 
-Em seguida, aplique a migração v2.0:
+Em seguida, aplique as migrações:
 
 ```bash
 mysql -u root -p green_air < database/migration_v2.sql
+mysql -u root -p green_air < database/migration_v2.1.sql
 ```
 
 ### 2) Variáveis de ambiente (`.env`)
@@ -122,6 +123,7 @@ storage/
   logs/               # Logs de erros de e-mail
 database/
   migration_v2.sql    # Migração v2.0
+  migration_v2.1.sql  # Migração v2.1 (espécie "Não identificada")
 docs/                 # Documentação detalhada
 database.sql          # Schema inicial
 ```

@@ -5,6 +5,31 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [2.1.1] - 2026-04-05 — UX Mobile, Notificações e Espécie Desconhecida
+
+### Adicionado
+
+#### Cadastro de Árvores
+- **"Não sei a espécie"**: checkbox nos formulários de cadastro e edição de árvores. Ao marcar, seleciona automaticamente a espécie "Não identificada" e desabilita o dropdown. Facilita o cadastro para usuários que não sabem identificar a espécie.
+- **Espécie "Não identificada"**: nova entrada no catálogo de espécies (`tree_species`) para árvores não classificadas.
+- **`database/migration_v2.1.sql`**: script de migração para inserir a espécie "Não identificada".
+
+### Corrigido
+
+#### Mobile — Bottom Navigation
+- **Ícones escapando da barra**: corrigido o problema em que os ícones da bottom navigation saíam da barra ao rolar a página em navegadores mobile com barra de endereços no topo. Causa: `100vh` não acompanhava o redimensionamento dinâmico da viewport.
+  - Substituição global de `100vh` por `100dvh` (Dynamic Viewport Height) em `style.css` e páginas de autenticação.
+  - `body` com `min-height: 100dvh` e `padding-bottom` incluindo `env(safe-area-inset-bottom)`.
+  - Bottom nav com `transform: translateZ(0)` para forçar composição GPU (fix para Safari).
+  - Altura da bottom nav inclui `env(safe-area-inset-bottom)` com `align-items: flex-start` + `padding-top`.
+
+#### Mobile — Notificações
+- **Popup de notificações no mobile**: o ícone de sino (notificações) no mobile redirecionava para a página JSON bruta (`/api/notificacoes`) ao invés de abrir o popup de toast.
+  - `<a href>` substituído por `<button>` no header mobile.
+  - Handler JS unificado (`querySelectorAll('#desktop-notif-btn, #mobile-notif-btn')`) — ambos os botões agora compartilham a mesma lógica de fetch + toast.
+
+---
+
 ## [2.1.0] - 2026-03-29 — Polimento, Segurança de E-mail e Páginas Legais
 
 ### Adicionado

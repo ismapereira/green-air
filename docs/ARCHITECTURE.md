@@ -50,6 +50,7 @@ storage/
   logs/                 Logs de erros de e-mail SMTP
 database/
   migration_v2.sql      Script de migração v2.0
+  migration_v2.1.sql    Espécie "Não identificada"
 ```
 
 ## Rotas

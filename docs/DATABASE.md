@@ -1,6 +1,6 @@
 # Banco de dados
 
-O schema inicial do projeto está em `database.sql`. A migração para v2.0 está em `database/migration_v2.sql`.
+O schema inicial do projeto está em `database.sql`. As migrações estão em `database/migration_v2.sql` e `database/migration_v2.1.sql`.
 
 ## Instalação
 
@@ -10,6 +10,9 @@ mysql -u root -p < database.sql
 
 # Migração v2.0 (novas tabelas + coluna role + índices)
 mysql -u root -p green_air < database/migration_v2.sql
+
+# Migração v2.1 (espécie "Não identificada")
+mysql -u root -p green_air < database/migration_v2.1.sql
 ```
 
 ## Visão geral (tabelas)
@@ -51,6 +54,10 @@ Catálogo de espécies.
 - `id` (PK)
 - `name`
 - `scientific_name` (opcional)
+
+Seeds padrão: Ipê-Amarelo, Pau-Brasil, Jacarandá-Mimoso, Sibipiruna, Quaresmeira.
+
+> **v2.1**: adicionada a espécie **"Não identificada"** (sem nome científico) para árvores cuja espécie o usuário não sabe identificar.
 
 ### `tree_status`
 

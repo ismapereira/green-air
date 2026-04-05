@@ -35,12 +35,18 @@ require ROOT_PATH . '/app/views/layout/header.php';
         <div class="row g-3">
             <div class="col-6">
                 <label class="form-label fw-bold">Espécie *</label>
-                <select name="species_id" class="form-select" required>
+                <select name="species_id" id="species-select" class="form-select" required>
                     <option value="">Selecione</option>
                     <?php foreach ($species as $s): ?>
                         <option value="<?= (int)$s['id'] ?>" <?= (($old['species_id'] ?? '') == $s['id']) ? 'selected' : '' ?>><?= htmlspecialchars($s['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
+                <div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" id="unknown-species">
+                    <label class="form-check-label small text-muted" for="unknown-species">
+                        <i class="bi bi-question-circle me-1"></i>Não sei a espécie
+                    </label>
+                </div>
             </div>
             <div class="col-6">
                 <label class="form-label fw-bold">Status *</label>
@@ -87,3 +93,46 @@ require ROOT_PATH . '/app/views/layout/header.php';
 $extraScripts = [BASE_URL . 'assets/js/geolocation.js'];
 require ROOT_PATH . '/app/views/layout/footer.php';
 ?>
+<script>
+(function() {
+    var select = document.getElementById('species-select');
+    var checkbox = document.getElementById('unknown-species');
+    if (!select || !checkbox) return;
+
+    // Encontra a option "Não identificada"
+    var unknownOption = null;
+    for (var i = 0; i < select.options.length; i++) {
+        var txt = select.options[i].text.normalize('NFC').toLowerCase();
+        if (txt.indexOf('identificada') !== -1) {
+            unknownOption = select.options[i];
+            break;
+        }
+    }
+
+    // Se a espécie já está selecionada como "Não identificada", marca o checkbox
+    if (unknownOption && select.value === unknownOption.value) {
+        checkbox.checked = true;
+        select.disabled = true;
+        select.style.opacity = '0.6';
+    }
+
+    checkbox.addEventListener('change', function() {
+        if (this.checked && unknownOption) {
+            select.value = unknownOption.value;
+            select.disabled = true;
+            select.style.opacity = '0.6';
+        } else {
+            select.disabled = false;
+            select.style.opacity = '1';
+            if (unknownOption && select.value === unknownOption.value) {
+                select.value = '';
+            }
+        }
+    });
+
+    // Ao submeter, garante que o select não fique disabled (senão não envia)
+    select.closest('form').addEventListener('submit', function() {
+        select.disabled = false;
+    });
+})();
+</script>
