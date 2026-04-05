@@ -50,7 +50,7 @@ storage/
   logs/                 Logs de erros de e-mail SMTP
 database/
   migration_v2.sql      Script de migração v2.0
-  migration_v2.1.sql    Espécie "Não identificada"
+  migration_v2.1.sql    Espécie "Não identificada" + tabela community_suggestions
 ```
 
 ## Rotas
@@ -65,8 +65,11 @@ Exemplos:
 - `GET /` → `HomeController::index()`
 - `GET /mapa` → `MapController::index()`
 - `GET /arvore/{id}` → `TreeController::show()`
+- `GET /sugestoes` → `SuggestionController::index()`
+- `POST /sugestoes/nova` → `SuggestionController::store()`
 - `GET /api/clima` → `DashboardController::apiClima()`
-- `POST /admin/sugestoes/aprovar/{id}` → `AdminSuggestionController::approve()`
+- `GET /admin/comunidade` → `AdminCommunitySuggestionController::index()`
+- `POST /admin/comunidade/responder/{id}` → `AdminCommunitySuggestionController::respond()`
 
 ## Controllers
 
@@ -98,8 +101,8 @@ Todos os models estendem `app/models/Model.php`, que encapsula o acesso ao PDO:
 **Models disponíveis**:
 
 | Model | Responsabilidade |
-|-------|-----------------|
-| `User` | Usuários, pontuação, ranking, level progress |
+|-------|--------------------|
+| `User` | Usuários, pontuação, ranking, level progress. `count()` e rankings excluem admins; `countAll()` inclui todos. |
 | `Tree` | Árvores (CRUD, contagens, filtros) |
 | `TreeSpecies` | Catálogo de espécies |
 | `TreeStatus` | Status de preservação |
@@ -107,10 +110,11 @@ Todos os models estendem `app/models/Model.php`, que encapsula o acesso ao PDO:
 | `Setting` | Configurações do admin |
 | `PasswordReset` | Tokens de recuperação de senha |
 | `Notification` | Notificações do usuário |
-| `TreeSuggestion` | Sugestões de atualização de árvores |
+| `TreeSuggestion` | Sugestões de atualização de árvores (legado) |
+| `CommunitySuggestion` | Sugestões colaborativas da comunidade (v2.1) |
 | `LoginAttempt` | Rate limiting de login |
 
-O schema do banco é criado por `database.sql` + `database/migration_v2.sql`. Detalhes em `DATABASE.md`.
+O schema do banco é criado por `database.sql` + `database/migration_v2.sql` + `database/migration_v2.1.sql`. Detalhes em `DATABASE.md`.
 
 ## Helpers
 

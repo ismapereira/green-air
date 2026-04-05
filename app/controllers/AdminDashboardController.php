@@ -11,7 +11,7 @@ class AdminDashboardController extends Controller
         $suggModel = new TreeSuggestion();
 
         $totalTrees = $treeModel->count();
-        $totalUsers = $userModel->count();
+        $totalUsers = $userModel->countAll();
         $topContributors = $userModel->topContributors(10);
         $riskCount = $treeModel->riskCount();
         $pendingSuggestions = $suggModel->pendingCount();

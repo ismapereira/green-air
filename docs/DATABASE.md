@@ -177,12 +177,31 @@ users 1──N trees
 users 1──N contributions_log
 users 1──N notifications
 users 1──N tree_suggestions
+users 1──N community_suggestions
 users 1──N login_attempts
 tree_species 1──N trees
 tree_status 1──N trees
 trees 1──N tree_suggestions
 trees 1──N contributions_log
 ```
+
+### `community_suggestions` (v2.1)
+
+Sugestões colaborativas da comunidade.
+
+- `id` (PK)
+- `user_id` (FK → `users.id`, CASCADE)
+- `category` (ENUM: `feature`, `species`, `improvement`, `bug`, `other`)
+- `title` (VARCHAR 150)
+- `description` (TEXT)
+- `status` (ENUM: `pending`, `reviewed`, `accepted`, `implemented`, `rejected`)
+- `admin_response` (TEXT, nullable)
+- `reviewed_by` (FK → `users.id`, SET NULL)
+- `reviewed_at` (TIMESTAMP, nullable)
+- `created_at`, `updated_at`
+- Índices: `idx_status`, `idx_category`, `idx_user`
+
+> **Nota**: Administradores (role = `admin`) são excluídos automaticamente dos rankings e contagens públicas de contribuidores.
 
 ## Seeds e usuário administrador
 

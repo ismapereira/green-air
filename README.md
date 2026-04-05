@@ -17,10 +17,10 @@ Aplicação web completa (PHP puro + MySQL + Bootstrap 5) para **mapear árvores
 - **Cadastro de árvores** com foto, espécie (ou "Não identificada"), status de preservação, tamanho, idade, observações e **geolocalização automática**.
 - **Mapa interativo (Leaflet + MarkerCluster)** com filtros por espécie, status e tamanho; centralização automática no GPS do usuário.
 - **Dashboard do usuário** com progresso de nível, ranking, **clima completo** (temperatura, umidade, vento, pressão, AQI, poluentes, previsão 5 dias) via OpenWeather.
-- **Gamificação** com pontos, níveis (Bronze/Prata/Ouro), ranking semanal/mensal/geral e pódio visual.
-- **Sugestões de atualização** de árvores — aprovadas por moderadores com bonificação de pontos.
-- **Notificações** internas para o usuário (boas-vindas, sugestões aprovadas, etc.).
-- **Painel admin** com dashboard de gráficos, gerenciamento de usuários (com roles), árvores, espécies, status, sugestões e configurações.
+- **Gamificação** com pontos, níveis (Bronze/Prata/Ouro), ranking semanal/mensal/geral e pódio visual. Administradores são excluídos dos rankings e métricas públicas.
+- **Sugestões colaborativas** temáticas — usuários podem sugerir novas funcionalidades, novas espécies, melhorias, reportar problemas. A equipe responde e atualiza o status diretamente.
+- **Notificações** internas para o usuário (boas-vindas, sugestões aprovadas/atualizadas, etc.).
+- **Painel admin** com dashboard de gráficos, gerenciamento de usuários (com roles), árvores, espécies, status, sugestões da comunidade e configurações.
 - **Design mobile-first** com Bootstrap 5.3, glassmorphism, dark mode e bottom navigation.
 
 ## Requisitos

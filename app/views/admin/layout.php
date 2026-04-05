@@ -90,7 +90,6 @@ $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
     <a href="<?= BASE_URL ?>admin/arvores" class="nav-link <?= strpos($currentPath, 'arvores') !== false ? 'active' : '' ?>"><i class="bi bi-tree"></i>Árvores</a>
     <a href="<?= BASE_URL ?>admin/especies" class="nav-link <?= strpos($currentPath, 'especies') !== false ? 'active' : '' ?>"><i class="bi bi-flower1"></i>Espécies</a>
     <a href="<?= BASE_URL ?>admin/status" class="nav-link <?= strpos($currentPath, '/status') !== false ? 'active' : '' ?>"><i class="bi bi-shield-check"></i>Status</a>
-    <a href="<?= BASE_URL ?>admin/sugestoes" class="nav-link <?= strpos($currentPath, 'sugestoes') !== false ? 'active' : '' ?>"><i class="bi bi-chat-square-text"></i>Sugestões</a>
     <a href="<?= BASE_URL ?>admin/comunidade" class="nav-link <?= strpos($currentPath, 'comunidade') !== false ? 'active' : '' ?>"><i class="bi bi-people"></i>Comunidade</a>
     <a href="<?= BASE_URL ?>admin/contribuicoes" class="nav-link <?= strpos($currentPath, 'contribuicoes') !== false ? 'active' : '' ?>"><i class="bi bi-clock-history"></i>Contribuições</a>
     <a href="<?= BASE_URL ?>admin/configuracoes" class="nav-link <?= strpos($currentPath, 'configuracoes') !== false ? 'active' : '' ?>"><i class="bi bi-gear"></i>Configurações</a>

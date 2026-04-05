@@ -5,28 +5,42 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
-## [2.1.1] - 2026-04-05 — UX Mobile, Notificações e Espécie Desconhecida
+## [2.1.1] - 2026-04-05 — Sugestões Colaborativas, UX Mobile e Métricas
 
 ### Adicionado
 
+#### Sugestões Colaborativas da Comunidade
+- **Sistema completo de sugestões**: formulário temático para usuários sugerirem melhorias, reportarem problemas, proporem novas espécies, novas funcionalidades ou qualquer outra ideia.
+- **Categorias temáticas**: `Nova funcionalidade`, `Nova espécie de árvore`, `Melhoria`, `Reportar problema` e `Outro` — com ícones e cores distintas.
+- **Fluxo do usuário** (`/sugestoes`): listagem das suas sugestões com status (Pendente, Em análise, Aceita, Implementada, Rejeitada), respostas da equipe, e formulário de envio com validação completa.
+- **Fluxo admin** (`/admin/comunidade`): painel de gerenciamento com filtros por status e categoria, estatísticas por categoria, visão detalhada de cada sugestão e formulário de resposta/atualização de status com notificação automática ao autor.
+- **Tabela `community_suggestions`**: novo schema com categorias (ENUM), status de fluxo, resposta do admin, e chaves estrangeiras para `users`.
+- **`CommunitySuggestion`** (Model): CRUD completo com filtros por status/categoria, contagem por categoria, e listagem por usuário.
+- **`SuggestionController`**: controller do lado do usuário com validação e flash messages.
+- **`AdminCommunitySuggestionController`**: controller admin com resposta, atualização de status e exclusão.
+- **Links de navegação**: "Sugestões" adicionado no dropdown do perfil (desktop) e no menu hambúrguer (mobile).
+
 #### Cadastro de Árvores
-- **"Não sei a espécie"**: checkbox nos formulários de cadastro e edição de árvores. Ao marcar, seleciona automaticamente a espécie "Não identificada" e desabilita o dropdown. Facilita o cadastro para usuários que não sabem identificar a espécie.
-- **Espécie "Não identificada"**: nova entrada no catálogo de espécies (`tree_species`) para árvores não classificadas.
-- **`database/migration_v2.1.sql`**: script de migração para inserir a espécie "Não identificada".
+- **"Não sei a espécie"**: checkbox nos formulários de cadastro e edição de árvores. Ao marcar, seleciona automaticamente a espécie "Não identificada" e desabilita o dropdown.
+- **Espécie "Não identificada"**: nova entrada no catálogo de espécies (`tree_species`).
+- **`database/migration_v2.1.sql`**: script de migração com espécie "Não identificada" + tabela `community_suggestions`.
+
+### Alterado
+
+#### Métricas e Rankings
+- **Admin excluído dos rankings**: o usuário administrador não aparece mais nos rankings (semanal, mensal, geral) nem no contador de contribuidores da homepage e dashboard. Métodos alterados: `topContributors()`, `weeklyRanking()`, `monthlyRanking()` e `count()` — todos com `WHERE role != 'admin'`.
+- **`countAll()`**: novo método no User model para o painel admin que inclui todos os usuários (inclusive admins) nos totais administrativos.
+
+#### Painel Administrativo
+- **Sidebar**: removido o link antigo "Sugestões" (TreeSuggestion de árvore) e mantido apenas "Comunidade" (novo sistema de sugestões colaborativas).
 
 ### Corrigido
 
 #### Mobile — Bottom Navigation
-- **Ícones escapando da barra**: corrigido o problema em que os ícones da bottom navigation saíam da barra ao rolar a página em navegadores mobile com barra de endereços no topo. Causa: `100vh` não acompanhava o redimensionamento dinâmico da viewport.
-  - Substituição global de `100vh` por `100dvh` (Dynamic Viewport Height) em `style.css` e páginas de autenticação.
-  - `body` com `min-height: 100dvh` e `padding-bottom` incluindo `env(safe-area-inset-bottom)`.
-  - Bottom nav com `transform: translateZ(0)` para forçar composição GPU (fix para Safari).
-  - Altura da bottom nav inclui `env(safe-area-inset-bottom)` com `align-items: flex-start` + `padding-top`.
+- **Ícones escapando da barra**: corrigido com `100dvh`, `env(safe-area-inset-bottom)` e `transform: translateZ(0)`.
 
 #### Mobile — Notificações
-- **Popup de notificações no mobile**: o ícone de sino (notificações) no mobile redirecionava para a página JSON bruta (`/api/notificacoes`) ao invés de abrir o popup de toast.
-  - `<a href>` substituído por `<button>` no header mobile.
-  - Handler JS unificado (`querySelectorAll('#desktop-notif-btn, #mobile-notif-btn')`) — ambos os botões agora compartilham a mesma lógica de fetch + toast.
+- **Popup de notificações no mobile**: `<a href>` substituído por `<button>` com handler JS unificado.
 
 ---
 

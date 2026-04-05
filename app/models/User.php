@@ -90,11 +90,17 @@ class User extends Model
 
     public function topContributors(int $limit = 10): array
     {
-        return $this->fetchAll('SELECT u.*, ul.name as level_name FROM users u
-            JOIN user_levels ul ON u.level_id = ul.id ORDER BY u.points DESC LIMIT ?', [$limit]);
+        return $this->fetchAll("SELECT u.*, ul.name as level_name FROM users u
+            JOIN user_levels ul ON u.level_id = ul.id WHERE u.role != 'admin' ORDER BY u.points DESC LIMIT ?", [$limit]);
     }
 
     public function count(): int
+    {
+        $r = $this->fetchOne("SELECT COUNT(*) as c FROM users WHERE role != 'admin'");
+        return (int)($r['c'] ?? 0);
+    }
+
+    public function countAll(): int
     {
         $r = $this->fetchOne('SELECT COUNT(*) as c FROM users');
         return (int)($r['c'] ?? 0);
@@ -103,12 +109,12 @@ class User extends Model
     public function weeklyRanking(int $limit = 10): array
     {
         return $this->fetchAll(
-            'SELECT u.id, u.name, u.photo, u.level_id, ul.name as level_name, SUM(c.points_awarded) as total
+            "SELECT u.id, u.name, u.photo, u.level_id, ul.name as level_name, SUM(c.points_awarded) as total
              FROM contributions_log c
              JOIN users u ON c.user_id = u.id
              JOIN user_levels ul ON u.level_id = ul.id
-             WHERE c.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-             GROUP BY u.id ORDER BY total DESC LIMIT ?',
+             WHERE c.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) AND u.role != 'admin'
+             GROUP BY u.id ORDER BY total DESC LIMIT ?",
             [$limit]
         );
     }
@@ -116,12 +122,12 @@ class User extends Model
     public function monthlyRanking(int $limit = 10): array
     {
         return $this->fetchAll(
-            'SELECT u.id, u.name, u.photo, u.level_id, ul.name as level_name, SUM(c.points_awarded) as total
+            "SELECT u.id, u.name, u.photo, u.level_id, ul.name as level_name, SUM(c.points_awarded) as total
              FROM contributions_log c
              JOIN users u ON c.user_id = u.id
              JOIN user_levels ul ON u.level_id = ul.id
-             WHERE c.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
-             GROUP BY u.id ORDER BY total DESC LIMIT ?',
+             WHERE c.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) AND u.role != 'admin'
+             GROUP BY u.id ORDER BY total DESC LIMIT ?",
             [$limit]
         );
     }
