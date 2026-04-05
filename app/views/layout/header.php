@@ -93,6 +93,9 @@ $route = '/' . ltrim($route, '/');
                     <a class="nav-link" href="<?= BASE_URL ?>minhas-arvores"><i class="bi bi-tree me-1"></i>Minhas Árvores</a>
                 </li>
                 <li class="nav-item d-lg-none">
+                    <a class="nav-link" href="<?= BASE_URL ?>sugestoes"><i class="bi bi-lightbulb me-1"></i>Sugestões</a>
+                </li>
+                <li class="nav-item d-lg-none">
                     <a class="nav-link" href="<?= BASE_URL ?>cadastrar-arvore"><i class="bi bi-plus-circle me-1"></i>Cadastrar Árvore</a>
                 </li>
                 <?php if (($currentUser['role'] ?? '') === 'admin'): ?>
@@ -128,6 +131,7 @@ $route = '/' . ltrim($route, '/');
                         <li><a class="dropdown-item" href="<?= BASE_URL ?>perfil"><i class="bi bi-person me-2"></i>Perfil</a></li>
                         <li><a class="dropdown-item" href="<?= BASE_URL ?>minhas-arvores"><i class="bi bi-tree me-2"></i>Minhas Árvores</a></li>
                         <li><a class="dropdown-item" href="<?= BASE_URL ?>cadastrar-arvore"><i class="bi bi-plus-circle me-2"></i>Cadastrar Árvore</a></li>
+                        <li><a class="dropdown-item" href="<?= BASE_URL ?>sugestoes"><i class="bi bi-lightbulb me-2"></i>Sugestões</a></li>
                         <?php if (($currentUser['role'] ?? '') === 'admin'): ?>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="<?= BASE_URL ?>admin"><i class="bi bi-shield-check me-2"></i>Admin</a></li>

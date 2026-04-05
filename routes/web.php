@@ -44,6 +44,11 @@ return [
     'GET /api/notificacoes'    => ['DashboardController', 'apiNotifications'],
     'POST /api/notificacoes/ler/{id}' => ['DashboardController', 'markNotificationRead'],
 
+    // Sugestões colaborativas (Usuário)
+    'GET /sugestoes'           => ['SuggestionController', 'index'],
+    'GET /sugestoes/nova'      => ['SuggestionController', 'create'],
+    'POST /sugestoes/nova'     => ['SuggestionController', 'store'],
+
     // Admin
     'GET /admin'               => ['AdminDashboardController', 'index'],
     'GET /admin/usuarios'      => ['AdminUserController', 'index'],
@@ -73,6 +78,12 @@ return [
     'GET /admin/sugestoes'     => ['AdminSuggestionController', 'index'],
     'POST /admin/sugestoes/aprovar/{id}' => ['AdminSuggestionController', 'approve'],
     'POST /admin/sugestoes/rejeitar/{id}' => ['AdminSuggestionController', 'reject'],
+
+    // Sugestões colaborativas da comunidade (Admin)
+    'GET /admin/comunidade'    => ['AdminCommunitySuggestionController', 'index'],
+    'GET /admin/comunidade/{id}' => ['AdminCommunitySuggestionController', 'show'],
+    'POST /admin/comunidade/responder/{id}' => ['AdminCommunitySuggestionController', 'respond'],
+    'POST /admin/comunidade/excluir/{id}' => ['AdminCommunitySuggestionController', 'delete'],
 
     'GET /admin/configuracoes' => ['AdminSettingsController', 'index'],
     'POST /admin/configuracoes' => ['AdminSettingsController', 'save'],
