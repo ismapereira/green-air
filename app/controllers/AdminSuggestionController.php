@@ -41,6 +41,9 @@ class AdminSuggestionController extends Controller
             '/arvore/' . $suggestion['tree_id']
         );
 
+        // Verificar conquistas do autor
+        BadgeChecker::check($suggestion['user_id']);
+
         $_SESSION['admin_success'] = 'Sugestão aprovada. +' . POINTS_SUGGESTION_APPROVED . ' pontos para o autor.';
         $this->redirect('/admin/sugestoes');
     }

@@ -6,6 +6,7 @@ class DashboardController extends Controller
         $user = $this->requireAuth();
         $treeModel = new Tree();
         $userModel = new User();
+        $badgeModel = new Badge();
         $trees = $treeModel->byUser($user['id']);
         $topContributors = $userModel->topContributors(5);
         $levelProgress = $userModel->levelProgress($user);
@@ -17,7 +18,9 @@ class DashboardController extends Controller
             'topContributors' => $topContributors,
             'levelProgress' => $levelProgress,
             'totalTreesGlobal' => $treeModel->count(),
-            'totalUsersGlobal' => $userModel->count()
+            'totalUsersGlobal' => $userModel->count(),
+            'allBadges' => $badgeModel->allWithStatus($user['id']),
+            'badgeCount' => $badgeModel->userBadgeCount($user['id'])
         ]);
     }
 

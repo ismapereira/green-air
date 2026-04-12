@@ -89,6 +89,9 @@ class AdminCommunitySuggestionController extends Controller
             '/sugestoes'
         );
 
+        // Verificar conquistas do autor (ex: sugestão aceita)
+        BadgeChecker::check($suggestion['user_id']);
+
         $_SESSION['admin_success'] = "Sugestão #{$id} atualizada para: {$statusLabel}.";
         $this->redirect('/admin/comunidade');
     }

@@ -74,6 +74,11 @@ $route = '/' . ltrim($route, '/');
                         <i class="bi bi-map me-1"></i>Mapa
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link <?= $route === '/estatisticas' ? 'active' : '' ?>" href="<?= BASE_URL ?>estatisticas">
+                        <i class="bi bi-bar-chart-line me-1"></i>Estatísticas
+                    </a>
+                </li>
                 <?php if ($currentUser): ?>
                 <li class="nav-item">
                     <a class="nav-link <?= $route === '/painel' ? 'active' : '' ?>" href="<?= BASE_URL ?>painel">

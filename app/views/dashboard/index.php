@@ -6,6 +6,8 @@ $topContributors = $topContributors ?? [];
 $levelProgress = $levelProgress ?? [];
 $totalTreesGlobal = $totalTreesGlobal ?? 0;
 $totalUsersGlobal = $totalUsersGlobal ?? 0;
+$allBadges = $allBadges ?? [];
+$badgeCount = $badgeCount ?? 0;
 require ROOT_PATH . '/app/views/layout/header.php';
 ?>
 
@@ -65,6 +67,37 @@ require ROOT_PATH . '/app/views/layout/header.php';
             </div>
         </div>
     </div>
+
+    <!-- Conquistas -->
+    <?php if (!empty($allBadges)): ?>
+    <div class="mb-4" data-aos="fade-up">
+        <h5 class="section-title"><i class="bi bi-award"></i> Conquistas <span class="badge bg-success-subtle text-success ms-1"><?= $badgeCount ?>/<?= count($allBadges) ?></span></h5>
+        <div class="glass-card p-3">
+            <div class="d-flex flex-wrap gap-3 justify-content-center">
+                <?php foreach ($allBadges as $b):
+                    $unlocked = !empty($b['unlocked_at']);
+                    // Monta estilos da badge em PHP para evitar interpolação complexa no HTML
+                    $badgeColor = htmlspecialchars($b['color']);
+                    $badgeTitle = htmlspecialchars($b['description'])
+                        . ($unlocked ? ' — Desbloqueada em ' . date('d/m/Y', strtotime($b['unlocked_at'])) : ' — Bloqueada');
+                    if ($unlocked) {
+                        $iconStyle = "background:{$badgeColor}20;color:{$badgeColor};border:2px solid {$badgeColor};";
+                    } else {
+                        $iconStyle = 'background:rgba(148,163,184,0.08);color:#64748B;border:2px dashed rgba(148,163,184,0.25);opacity:0.45;';
+                    }
+                    $nameColor = $unlocked ? 'var(--ga-text)' : '#94A3B8';
+                ?>
+                <div class="text-center" style="width:72px" title="<?= $badgeTitle ?>">
+                    <div style="width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 4px;font-size:1.4rem;<?= $iconStyle ?>">
+                        <i class="bi <?= htmlspecialchars($b['icon']) ?>"></i>
+                    </div>
+                    <span class="d-block" style="font-size:0.62rem;line-height:1.2;color:<?= $nameColor ?>"><?= htmlspecialchars($b['name']) ?></span>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <!-- Climate Widget -->
     <div class="mb-4" data-aos="fade-up">

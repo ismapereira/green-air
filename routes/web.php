@@ -8,6 +8,7 @@ return [
     'GET /'                    => ['HomeController', 'index'],
     'GET /termos'              => ['HomeController', 'terms'],
     'GET /privacidade'         => ['HomeController', 'privacy'],
+    'GET /estatisticas'        => ['HomeController', 'publicDashboard'],
     'GET /login'               => ['AuthController', 'loginForm'],
     'POST /login'              => ['AuthController', 'login'],
     'GET /logout'              => ['AuthController', 'logout'],

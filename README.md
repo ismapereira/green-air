@@ -16,11 +16,13 @@ Aplicação web completa (PHP puro + MySQL + Bootstrap 5) para **mapear árvores
 
 - **Cadastro de árvores** com foto, espécie (ou "Não identificada"), status de preservação, tamanho, idade, observações e **geolocalização automática**.
 - **Mapa interativo (Leaflet + MarkerCluster)** com filtros por espécie, status e tamanho; centralização automática no GPS do usuário.
-- **Dashboard do usuário** com progresso de nível, ranking, **clima completo** (temperatura, umidade, vento, pressão, AQI, poluentes, previsão 5 dias) via OpenWeather.
-- **Gamificação** com pontos, níveis (Bronze/Prata/Ouro), ranking semanal/mensal/geral e pódio visual. Administradores são excluídos dos rankings e métricas públicas.
-- **Sugestões colaborativas** temáticas — usuários podem sugerir novas funcionalidades, novas espécies, melhorias, reportar problemas. A equipe responde e atualiza o status diretamente.
-- **Notificações** internas para o usuário (boas-vindas, sugestões aprovadas/atualizadas, etc.).
-- **Painel admin** com dashboard de gráficos, gerenciamento de usuários (com roles), árvores, espécies, status, sugestões da comunidade e configurações.
+- **Dashboard do usuário** com progresso de nível, ranking, conquistas, **clima completo** (temperatura, umidade, vento, pressão, AQI, poluentes, previsão 5 dias) via OpenWeather.
+- **Gamificação** com pontos, níveis, ranking semanal/mensal/geral e **10 conquistas** (badges) que desbloqueiam automaticamente. Admins excluídos dos rankings.
+- **Dashboard público** (`/estatisticas`) com gráficos Chart.js de distribuição por espécie e bairro, top contribuidores e últimas árvores.
+- **Sugestões colaborativas** temáticas — novas funcionalidades, espécies, melhorias e problemas. Fluxo completo com resposta admin e notificações.
+- **Segurança**: CAPTCHA (reCAPTCHA v2 Invisible), CSP headers, CSRF, rate limiting, bcrypt, credenciais externalizadas.
+- **Notificações** internas para o usuário (boas-vindas, sugestões, conquistas desbloqueadas, etc.).
+- **Painel admin** com dashboard de gráficos, gerenciamento de usuários, árvores, espécies, status, comunidade e configurações.
 - **Design mobile-first** com Bootstrap 5.3, glassmorphism, dark mode e bottom navigation.
 
 ## Requisitos

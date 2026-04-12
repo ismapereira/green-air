@@ -126,6 +126,7 @@ unset($_SESSION['login_error'], $_SESSION['register_success']);
         }
         a.auth-back:hover { color: #fff; }
     </style>
+    <?= CaptchaHelper::renderScript() ?>
 </head>
 <body>
 <div class="auth-wrapper">
@@ -145,7 +146,7 @@ unset($_SESSION['login_error'], $_SESSION['register_success']);
             <div class="alert alert-danger py-2 mb-3"><i class="bi bi-exclamation-circle me-2"></i><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
-        <form method="post" action="<?= BASE_URL ?>login">
+        <form method="post" action="<?= BASE_URL ?>login" id="login-form">
             <input type="hidden" name="_csrf" value="<?= $csrfToken ?>">
 
             <div class="mb-3">
@@ -167,6 +168,8 @@ unset($_SESSION['login_error'], $_SESSION['register_success']);
             <div class="d-flex justify-content-end mb-3">
                 <a href="<?= BASE_URL ?>esqueci-senha" class="auth-link" style="font-size:0.8rem">Esqueci minha senha</a>
             </div>
+
+            <?= CaptchaHelper::renderWidget('login-form') ?>
 
             <button type="submit" class="btn-auth">
                 <i class="bi bi-box-arrow-in-right"></i> Entrar

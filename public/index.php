@@ -14,6 +14,20 @@ require __DIR__ . '/../config/env.php';
 require __DIR__ . '/../config/database.php';
 require __DIR__ . '/../config/app.php';
 
+// Headers de segurança (CSP)
+header("Content-Security-Policy: "
+    . "default-src 'self'; "
+    . "script-src 'self' 'unsafe-inline' cdn.jsdelivr.net www.google.com www.gstatic.com unpkg.com; "
+    . "style-src 'self' 'unsafe-inline' cdn.jsdelivr.net fonts.googleapis.com unpkg.com; "
+    . "img-src 'self' data: blob: tile.openstreetmap.org *.tile.openstreetmap.org api.openweathermap.org openweathermap.org; "
+    . "font-src 'self' fonts.gstatic.com cdn.jsdelivr.net; "
+    . "connect-src 'self' api.openweathermap.org nominatim.openstreetmap.org www.google.com; "
+    . "frame-src www.google.com;"
+);
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: SAMEORIGIN');
+header('Referrer-Policy: strict-origin-when-cross-origin');
+
 $routes = require ROOT_PATH . '/routes/web.php';
 
 // Método e path

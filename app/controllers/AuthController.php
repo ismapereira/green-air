@@ -35,6 +35,13 @@ class AuthController extends Controller
             return;
         }
 
+        // Verificar CAPTCHA (ignorado se não configurado)
+        if (!CaptchaHelper::verify()) {
+            $_SESSION['login_error'] = 'Verificação anti-robô falhou. Tente novamente.';
+            $this->redirect('/login');
+            return;
+        }
+
         // Rate limiting
         if ($this->attemptModel->isBlocked($email, $ip, LOGIN_MAX_ATTEMPTS, LOGIN_LOCKOUT_MINUTES)) {
             $_SESSION['login_error'] = 'Muitas tentativas. Tente novamente em ' . LOGIN_LOCKOUT_MINUTES . ' minutos.';
@@ -86,6 +93,15 @@ class AuthController extends Controller
     public function register(): void
     {
         $this->validateCsrf();
+
+        // Verificar CAPTCHA (ignorado se não configurado)
+        if (!CaptchaHelper::verify()) {
+            $_SESSION['register_error'] = 'Verificação anti-robô falhou. Tente novamente.';
+            $_SESSION['register_old'] = $_POST;
+            $this->redirect('/registro');
+            return;
+        }
+
         $name = trim(filter_var($_POST['name'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS));
         $email = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
         $password = $_POST['password'] ?? '';
@@ -147,6 +163,14 @@ class AuthController extends Controller
     public function forgot(): void
     {
         $this->validateCsrf();
+
+        // Verificar CAPTCHA (ignorado se não configurado)
+        if (!CaptchaHelper::verify()) {
+            $_SESSION['forgot_message'] = ['type' => 'error', 'text' => 'Verificação anti-robô falhou. Tente novamente.'];
+            $this->redirect('/esqueci-senha');
+            return;
+        }
+
         $email = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
         if (!$email) {
             $_SESSION['forgot_message'] = ['type' => 'error', 'text' => 'Informe o e-mail.'];

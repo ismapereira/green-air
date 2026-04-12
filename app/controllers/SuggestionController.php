@@ -70,6 +70,9 @@ class SuggestionController extends Controller
         $model = new CommunitySuggestion();
         $model->create($user['id'], $category, $title, $description);
 
+        // Verificar conquistas
+        BadgeChecker::check($user['id']);
+
         $_SESSION['flash_success'] = 'Sugestão enviada com sucesso! A equipe irá analisá-la.';
         $this->redirect('/sugestoes');
     }

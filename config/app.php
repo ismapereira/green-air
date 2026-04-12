@@ -47,6 +47,10 @@ define('CACHE_CLIMATE_TTL', 600); // 10 minutos
 define('LOGIN_MAX_ATTEMPTS', 5);
 define('LOGIN_LOCKOUT_MINUTES', 15);
 
+// reCAPTCHA (deixar vazio para desativar)
+define('RECAPTCHA_SITE_KEY', env('RECAPTCHA_SITE_KEY', ''));
+define('RECAPTCHA_SECRET_KEY', env('RECAPTCHA_SECRET_KEY', ''));
+
 // Fuso e locale
 date_default_timezone_set('America/Sao_Paulo');
 setlocale(LC_ALL, 'pt_BR.UTF-8');

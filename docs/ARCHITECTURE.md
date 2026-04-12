@@ -51,6 +51,7 @@ storage/
 database/
   migration_v2.sql      Script de migração v2.0
   migration_v2.1.sql    Espécie "Não identificada" + tabela community_suggestions
+  migration_v2.2.sql    Tabelas badges e user_badges + seeds de conquistas
 ```
 
 ## Rotas
@@ -67,6 +68,7 @@ Exemplos:
 - `GET /arvore/{id}` → `TreeController::show()`
 - `GET /sugestoes` → `SuggestionController::index()`
 - `POST /sugestoes/nova` → `SuggestionController::store()`
+- `GET /estatisticas` → `HomeController::publicDashboard()`
 - `GET /api/clima` → `DashboardController::apiClima()`
 - `GET /admin/comunidade` → `AdminCommunitySuggestionController::index()`
 - `POST /admin/comunidade/responder/{id}` → `AdminCommunitySuggestionController::respond()`
@@ -112,9 +114,10 @@ Todos os models estendem `app/models/Model.php`, que encapsula o acesso ao PDO:
 | `Notification` | Notificações do usuário |
 | `TreeSuggestion` | Sugestões de atualização de árvores (legado) |
 | `CommunitySuggestion` | Sugestões colaborativas da comunidade (v2.1) |
+| `Badge` | Conquistas: catálogo, desbloqueio, status por usuário (v2.2) |
 | `LoginAttempt` | Rate limiting de login |
 
-O schema do banco é criado por `database.sql` + `database/migration_v2.sql` + `database/migration_v2.1.sql`. Detalhes em `DATABASE.md`.
+O schema do banco é criado por `database.sql` + `database/migration_v2.sql` + `database/migration_v2.1.sql` + `database/migration_v2.2.sql`. Detalhes em `DATABASE.md`.
 
 ## Helpers
 
@@ -123,6 +126,8 @@ O schema do banco é criado por `database.sql` + `database/migration_v2.sql` + `
 | `UploadHelper` | Upload centralizado: validação MIME/tamanho, nomes aleatórios, limpeza de arquivos antigos |
 | `CacheHelper` | Cache file-based em `storage/cache/` com TTL configurável |
 | `SmtpMailer` | Envio de e-mails via SMTP (TLS/SSL, AUTH LOGIN) sem dependências externas. Credenciais via `.env` |
+| `BadgeChecker` | Verificação automática de conquistas após ações-chave. Notifica o usuário ao desbloquear (v2.2) |
+| `CaptchaHelper` | Google reCAPTCHA v2 Invisible: render, verificação server-side, fallback automático (v2.2) |
 
 ## Uploads
 

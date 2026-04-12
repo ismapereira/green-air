@@ -203,6 +203,29 @@ Sugestões colaborativas da comunidade.
 
 > **Nota**: Administradores (role = `admin`) são excluídos automaticamente dos rankings e contagens públicas de contribuidores.
 
+### `badges` (v2.2)
+
+Catálogo de conquistas do sistema.
+
+- `id` (PK)
+- `slug` (VARCHAR 50, UNIQUE) — identificador único
+- `name` (VARCHAR 100)
+- `description` (VARCHAR 255)
+- `icon` (VARCHAR 50) — classe Bootstrap Icons
+- `color` (VARCHAR 30) — cor do badge
+- `criteria_type` (VARCHAR 50) — tipo de critério (`trees_count`, `community_suggestions_count`, `distinct_species_count`, `streak_days`, etc.)
+- `criteria_value` (INT) — valor necessário para desbloquear
+
+### `user_badges` (v2.2)
+
+Relação M:N entre usuários e conquistas.
+
+- `id` (PK)
+- `user_id` (FK → `users.id`, CASCADE)
+- `badge_id` (FK → `badges.id`, CASCADE)
+- `unlocked_at` (TIMESTAMP)
+- UNIQUE KEY: `(user_id, badge_id)`
+
 ## Seeds e usuário administrador
 
 O `database.sql` insere:

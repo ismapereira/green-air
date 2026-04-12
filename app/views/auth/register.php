@@ -100,6 +100,7 @@ $old = $old ?? [];
 
         .modal-content { border-radius: 16px !important; }
     </style>
+    <?= CaptchaHelper::renderScript() ?>
 </head>
 <body>
 <div class="auth-wrapper">
@@ -116,7 +117,7 @@ $old = $old ?? [];
             <div class="alert alert-danger py-2 mb-3"><i class="bi bi-exclamation-circle me-2"></i><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
-        <form method="post" action="<?= BASE_URL ?>registro" enctype="multipart/form-data">
+        <form method="post" action="<?= BASE_URL ?>registro" enctype="multipart/form-data" id="register-form">
             <input type="hidden" name="_csrf" value="<?= $csrfToken ?>">
 
             <div class="mb-3">
@@ -163,6 +164,8 @@ $old = $old ?? [];
                     Li e aceito os <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Termos de Uso</a>
                 </label>
             </div>
+
+            <?= CaptchaHelper::renderWidget('register-form') ?>
 
             <button type="submit" class="btn-auth">
                 <i class="bi bi-person-plus"></i> Criar Conta

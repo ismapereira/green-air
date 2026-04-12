@@ -109,6 +109,9 @@ class TreeController extends Controller
         unset($freshUser['password']);
         $_SESSION['user'] = $freshUser;
 
+        // Verificar conquistas
+        BadgeChecker::check($user['id']);
+
         $_SESSION['success'] = 'Árvore cadastrada com sucesso! +' . POINTS_NEW_TREE . ' pontos';
         $this->redirect('/minhas-arvores');
     }
@@ -230,6 +233,9 @@ class TreeController extends Controller
         $suggModel = new TreeSuggestion();
         $suggModel->create($user['id'], $id, $suggestion);
         $this->logModel->log($user['id'], $id, ContributionLog::ACTION_SUGGEST_UPDATE, 0);
+
+        // Verificar conquistas
+        BadgeChecker::check($user['id']);
 
         $_SESSION['success'] = 'Sugestão registrada! Um moderador irá avaliar.';
         $this->redirect('/minhas-arvores');

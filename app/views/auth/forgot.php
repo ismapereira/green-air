@@ -53,6 +53,7 @@ $message = $message ?? null;
         }
         a.auth-back:hover { color: #fff; }
     </style>
+    <?= CaptchaHelper::renderScript() ?>
 </head>
 <body>
 <div class="auth-wrapper">
@@ -72,7 +73,7 @@ $message = $message ?? null;
             </div>
         <?php endif; ?>
 
-        <form method="post" action="<?= BASE_URL ?>esqueci-senha">
+        <form method="post" action="<?= BASE_URL ?>esqueci-senha" id="forgot-form">
             <input type="hidden" name="_csrf" value="<?= $csrfToken ?>">
             <div class="mb-3">
                 <label>E-mail</label>
@@ -81,6 +82,7 @@ $message = $message ?? null;
                     <input type="email" name="email" placeholder="seu@email.com" required autofocus>
                 </div>
             </div>
+            <?= CaptchaHelper::renderWidget('forgot-form') ?>
             <button type="submit" class="btn-auth"><i class="bi bi-send"></i> Enviar Link</button>
         </form>
     </div>

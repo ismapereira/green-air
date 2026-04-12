@@ -4,6 +4,38 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
+## [2.2.0] - 2026-04-11 — Conquistas, Segurança e Dashboard Público
+
+### Adicionado
+
+#### Sistema de Conquistas (Badges)
+- **10 conquistas** desbloqueáveis automaticamente com base nas ações do usuário: Primeira Árvore, Plantador (5), Guardião Verde (10), Reflorestador (25), Centurião (100), Voz Ativa, Colaborador, Explorador (3 espécies), Maratonista (7 dias), Olho Vivo.
+- **Tabelas**: `badges` (catálogo) e `user_badges` (relação M:N com timestamp de desbloqueio).
+- **Badge Model** (`Badge.php`): `all()`, `allWithStatus()`, `userBadges()`, `unlock()`, `hasBadge()`.
+- **BadgeChecker Helper**: verificação automática executada após cadastro de árvores, envio de sugestões e aprovação de sugestões. Envia notificação quando conquista é desbloqueada.
+- **Dashboard do usuário**: seção "Conquistas" com badges coloridos (desbloqueados) e cinza (pendentes), progresso X/10.
+
+#### CAPTCHA (Google reCAPTCHA v2 Invisible)
+- **CaptchaHelper** (`CaptchaHelper.php`): `renderScript()`, `renderWidget()`, `verify()` com fallback automático quando chaves não configuradas.
+- Integrado nos formulários de **login**, **registro** e **recuperação de senha**.
+- Validação server-side no `AuthController` (`login()`, `register()` e `forgot()`).
+- Atributo `id` adicionado nos `<form>` para compatibilidade com callback `onCaptchaSubmit_*`.
+- Configuração via `.env`: `RECAPTCHA_SITE_KEY` e `RECAPTCHA_SECRET_KEY`.
+
+#### CSP Headers (Content Security Policy)
+- Headers de segurança no `public/index.php`: `Content-Security-Policy`, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`.
+- Whitelist de CDNs (Bootstrap, Chart.js, Leaflet, Google Fonts, reCAPTCHA, OpenWeatherMap, OpenStreetMap).
+
+#### Dashboard Público
+- **Rota `/estatisticas`** acessível sem login com estatísticas da plataforma.
+- Métricas: total de árvores, contribuidores, espécies, bairros.
+- **Gráficos Chart.js**: barras horizontais (por espécie) e donut (por bairro).
+- Top 5 contribuidores com avatar e nível.
+- Últimas árvores cadastradas com foto e espécie.
+- CTA de registro para visitantes.
+- Link "Estatísticas" na barra de navegação pública.
+
+---
 
 ## [2.1.1] - 2026-04-05 — Sugestões Colaborativas, UX Mobile e Métricas
 
@@ -162,8 +194,6 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não Lançado]
 ### Planejado
-- CAPTCHA em formulários de cadastro e recuperação de senha.
-- Content Security Policy (CSP) headers.
 - Exportação de dados do usuário (portabilidade LGPD).
 
 ## [1.0.0] - Nova Estrutura MVC - Marco Zero
