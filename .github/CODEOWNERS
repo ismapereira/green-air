@@ -1,0 +1,21 @@
+# 👥 Ficheiro CODEOWNERS
+# Define automaticamente os revisores com base nos caminhos dos ficheiros alterados.
+
+# Por padrão, @ismapereira é o proprietário e revisor global de todo o repositório
+* @ismapereira
+
+# Responsáveis por alterações na infraestrutura de segurança e credenciais
+/.env.example @ismapereira
+/config/ @ismapereira
+/app/helpers/CaptchaHelper.php @ismapereira
+/app/helpers/UploadHelper.php @ismapereira
+
+# Responsáveis pela lógica de negócio e manipulação da base de dados (MVC)
+/app/controllers/ @ismapereira
+/app/models/ @ismapereira
+/database/ @ismapereira
+/database.sql @ismapereira
+
+# Responsáveis por alterações de estilo e Assets do Frontend
+/public/assets/css/ @ismapereira
+/public/assets/js/ @ismapereira
