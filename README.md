@@ -1,14 +1,14 @@
 <h1 align="center">🌲 Green Air - Mapeamento Colaborativo de Árvores Urbanas</h1>
 
-<p align="center">
-  <img src = "https://img.shields.io/badge/License-MIT-green.svg">
-  <img src = "https://img.shields.io/badge/PHP-8.x-777BB4?logo=php&logoColor=white">
-  <img src = "https://img.shields.io/badge/MySQL-Database-4479A1?logo=mysql&logoColor=white">
-  <img src = "https://img.shields.io/badge/API-OpenWeather-orange?logo=icloud&logoColor=white">
-  <img src = "https://img.shields.io/badge/Map-Leaflet-199900?logo=leaflet&logoColor=white">
-  <img src = "https://img.shields.io/badge/Open%20Source-Yes-brightgreen?logo=opensourceinitiative">
-  <img src = "https://img.shields.io/badge/Urban%20Ecology-Tree%20Mapping-3CB371?logo=leaflet">
-</p>
+<div align="center">
+
+[![Estrelas](https://img.shields.io/github/stars/ismapereira/green-air?style=flat-square&color=2ecc71)](https://github.com/ismapereira/green-air/stargazers) [![Forks](https://img.shields.io/github/forks/ismapereira/green-air?style=flat-square&color=2ecc71)](https://github.com/ismapereira/green-air/network/members) [![Issues](https://img.shields.io/github/issues/ismapereira/green-air?style=flat-square&color=f39c12)](https://github.com/ismapereira/green-air/issues) ![Status](https://img.shields.io/badge/Status-Ativo-3498db?style=flat-square) ![Último Commit](https://img.shields.io/github/last-commit/ismapereira/green-air?style=flat-square&color=8e44ad) [![Licença](https://img.shields.io/github/license/ismapereira/green-air?style=flat-square&color=27ae60)](https://github.com/ismapereira/green-air/blob/main/LICENSE)
+
+<br>
+
+![PHP](https://img.shields.io/badge/PHP-8.x-777BB4?style=flat-square&logo=php&logoColor=white) ![MySQL](https://img.shields.io/badge/MySQL-Database-4479A1?style=flat-square&logo=mysql&logoColor=white) ![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=flat-square&logo=bootstrap&logoColor=white) ![Leaflet](https://img.shields.io/badge/Leaflet-Map-199900?style=flat-square&logo=leaflet&logoColor=white) ![OpenWeather](https://img.shields.io/badge/OpenWeather-API-eb6e4b?style=flat-square&logo=icloud&logoColor=white)
+
+</div>
 
 Aplicação web completa (PHP puro + MySQL + Bootstrap 5) para **mapear árvores urbanas** de forma colaborativa: cadastro com foto e GPS, mapa interativo com clusters, gamificação por pontos/níveis, painel de clima expandido e painel administrativo.
 
